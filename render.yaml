@@ -42,8 +42,7 @@ services:
       - key: MAIL_FROM_ADDRESS
         sync: false  # Set this in Render dashboard
 
-databases:
-  # PostgreSQL Database (free tier)
-  - name: bsu-bokod-db
-    plan: free
-    databaseName: libsystem4
+# Note: Render doesn't offer MySQL in their blueprint.
+# You need to create MySQL database manually from Render dashboard.
+# Go to: Dashboard → New + → MySQL
+# Then connect it to your web service via environment variables.
