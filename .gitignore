@@ -1,6 +1,6 @@
-# Composer dependencies
-/vendor/
-composer.lock
+# Composer dependencies (vendor will be installed during deployment)
+# Uncomment the line below if you want to exclude vendor from git
+# /vendor/
 
 # IDE files
 .vscode/
