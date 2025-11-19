@@ -14,7 +14,7 @@ $total_posts = $count_result->fetch_assoc()['total'];
 $total_pages = ceil($total_posts / $limit);
 
 // Fetch posts
-$sql = "SELECT * FROM posts ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+$sql = "SELECT * FROM posts ORDER BY created_on DESC LIMIT $limit OFFSET $offset";
 $query = $conn->query($sql);
 ?>
 
@@ -38,7 +38,7 @@ if ($id) {
           echo "
             <div class='announcement-item mb-4'>
               <h5 class='fw-bold text-success'>{$row['title']}</h5>
-              <small class='text-muted'>Published on: ".date('F d, Y h:i A', strtotime($row['created_at']))."</small>
+              <small class='text-muted'>Published on: ".date('F d, Y h:i A', strtotime($row['created_on']))."</small>
               <p class='mt-2'>".nl2br(substr($row['content'], 0, 200))."...</p>
               
               </a>
