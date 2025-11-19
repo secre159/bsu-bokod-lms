@@ -1,0 +1,50 @@
+services:
+  # Web Service for PHP Application
+  - type: web
+    name: bsu-bokod-lms
+    runtime: docker
+    plan: free
+    rootDir: .
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bsu-bokod-db
+          property: connectionString
+      - key: DB_HOST
+        fromDatabase:
+          name: bsu-bokod-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: bsu-bokod-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: bsu-bokod-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: bsu-bokod-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: bsu-bokod-db
+          property: password
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        sync: false  # Set this in Render dashboard
+      - key: MAIL_PASSWORD
+        sync: false  # Set this in Render dashboard
+      - key: MAIL_FROM_ADDRESS
+        sync: false  # Set this in Render dashboard
+
+databases:
+  # MySQL Database
+  - name: bsu-bokod-db
+    plan: free
+    databaseName: libsystem4
+    user: libsystem_user

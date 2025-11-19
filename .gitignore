@@ -1,0 +1,36 @@
+# Composer dependencies
+/vendor/
+composer.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Uploaded files (if not tracking them)
+# libsystem/images/profile_user/*
+# libsystem/e-books/*
+# libsystem/admin/uploads/*
+
+# Cache files
+*.cache
