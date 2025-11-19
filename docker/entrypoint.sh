@@ -2,8 +2,17 @@
 set -e
 
 # Update database configuration files with environment variables
-if [ ! -z "$DB_HOST" ] && [ ! -z "$DB_USER" ] && [ ! -z "$DB_PASSWORD" ] && [ ! -z "$DB_NAME" ]; then
-    echo "Updating database configuration..."
+if [ ! -z "$DATABASE_URL" ]; then
+    echo "Detected PostgreSQL DATABASE_URL from Render, using PostgreSQL..."
+    
+    # Copy PostgreSQL connection file
+    cp /var/www/html/docker/conn_postgres.php /var/www/html/libsystem/includes/conn.php
+    cp /var/www/html/docker/conn_postgres.php /var/www/html/libsystem/admin/includes/conn.php
+    
+    echo "PostgreSQL configuration applied successfully"
+    
+elif [ ! -z "$DB_HOST" ] && [ ! -z "$DB_USER" ] && [ ! -z "$DB_PASSWORD" ] && [ ! -z "$DB_NAME" ]; then
+    echo "Using MySQL configuration..."
     
     # Update user-facing conn.php
     cat > /var/www/html/libsystem/includes/conn.php << EOF
@@ -27,7 +36,7 @@ EOF
 ?>
 EOF
 
-    echo "Database configuration updated successfully"
+    echo "MySQL configuration updated successfully"
 fi
 
 # Update mailer configuration if environment variables are set

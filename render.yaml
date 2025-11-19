@@ -43,8 +43,7 @@ services:
         sync: false  # Set this in Render dashboard
 
 databases:
-  # MySQL Database
+  # PostgreSQL Database (free tier)
   - name: bsu-bokod-db
     plan: free
     databaseName: libsystem4
-    user: libsystem_user

@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y \
     mysqli \
     pdo \
     pdo_mysql \
+    pdo_pgsql \
+    pgsql \
     zip \
     gd \
     && apt-get clean \
