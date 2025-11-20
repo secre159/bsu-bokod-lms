@@ -7,42 +7,32 @@ services:
     rootDir: .
     dockerfilePath: ./Dockerfile
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: bsu-bokod-db
-          property: connectionString
       - key: DB_HOST
-        fromDatabase:
-          name: bsu-bokod-db
+        fromService:
+          name: bsu-bokod-mysql
+          type: pserv
           property: host
       - key: DB_PORT
-        fromDatabase:
-          name: bsu-bokod-db
-          property: port
+        value: "3306"
       - key: DB_NAME
-        fromDatabase:
-          name: bsu-bokod-db
-          property: database
+        value: libsystem4
       - key: DB_USER
-        fromDatabase:
-          name: bsu-bokod-db
-          property: user
+        value: libsystem_user
       - key: DB_PASSWORD
-        fromDatabase:
-          name: bsu-bokod-db
-          property: password
+        fromService:
+          name: bsu-bokod-mysql
+          type: pserv
+          envVarKey: MYSQL_PASSWORD
       - key: MAIL_HOST
         value: smtp.gmail.com
       - key: MAIL_PORT
         value: "587"
       - key: MAIL_USERNAME
-        sync: false  # Set this in Render dashboard
+        sync: false
       - key: MAIL_PASSWORD
-        sync: false  # Set this in Render dashboard
+        sync: false
       - key: MAIL_FROM_ADDRESS
-        sync: false  # Set this in Render dashboard
+        sync: false
 
-# Note: Render doesn't offer MySQL in their blueprint.
-# You need to create MySQL database manually from Render dashboard.
-# Go to: Dashboard → New + → MySQL
-# Then connect it to your web service via environment variables.
+# Note: This service connects to the MySQL Private Service named 'bsu-bokod-mysql'
+# Make sure that service is running before deploying this web service.
