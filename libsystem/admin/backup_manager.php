@@ -141,7 +141,9 @@ if(isset($_POST['restore_backup'])){
     if(file_exists($filepath)){
         $file_content = file_get_contents($filepath);
         
+        // Disable strict mode to allow 0000-00-00 dates and other legacy data
         $conn->query("SET FOREIGN_KEY_CHECKS=0");
+        $conn->query("SET sql_mode=''");
         
         // Clear existing data
         $result = $conn->query("SHOW TABLES");
@@ -153,6 +155,7 @@ if(isset($_POST['restore_backup'])){
         $statements = explode(';', $file_content);
         $success_count = 0;
         $error_count = 0;
+        $errors = array();
         
         foreach($statements as $statement){
             $statement = trim($statement);
@@ -161,14 +164,19 @@ if(isset($_POST['restore_backup'])){
                     $success_count++;
                 } else {
                     $error_count++;
+                    if(count($errors) < 5){ // Store first 5 errors
+                        $errors[] = $conn->error;
+                    }
                 }
             }
         }
         
         $conn->query("SET FOREIGN_KEY_CHECKS=1");
+        $conn->query("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
         
         if($error_count > 0){
-            $_SESSION['error'] = "Restore completed with {$error_count} errors.";
+            $error_detail = count($errors) > 0 ? "First error: " . $errors[0] : "";
+            $_SESSION['error'] = "Restore completed with {$error_count} errors. {$error_detail}";
         } else {
             $_SESSION['success'] = "Database restored successfully! ({$success_count} queries executed)";
         }
