@@ -1,5 +1,6 @@
 <?php
 include 'includes/session.php';
+include 'includes/conn.php'; // make sure your DB connection is included
 
 if (isset($_POST['delete'])) {
     $id = $_POST['id'];
@@ -13,19 +14,20 @@ if (isset($_POST['delete'])) {
     $stmt->close();
 
     if ($student) {
-        // Extract details
+        // Extract details including middlename
         $student_id = $student['student_id'];
         $firstname  = $student['firstname'];
+        $middlename = $student['middlename']; // added
         $lastname   = $student['lastname'];
         $email      = $student['email'];
         $phone      = $student['phone'];
         $course_id  = $student['course_id'];
 
-        // Archive record
+        // Archive record including middlename
         $stmt2 = $conn->prepare("INSERT INTO archived_students 
-            (student_id, firstname, lastname, email, phone, course_id, archived_on) 
-            VALUES (?, ?, ?, ?, ?, ?, NOW())");
-        $stmt2->bind_param("sssssi", $student_id, $firstname, $lastname, $email, $phone, $course_id);
+            (student_id, firstname, middlename, lastname, email, phone, course_id, archived_on) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+        $stmt2->bind_param("ssssssi", $student_id, $firstname, $middlename, $lastname, $email, $phone, $course_id);
 
         if ($stmt2->execute()) {
             $stmt2->close();

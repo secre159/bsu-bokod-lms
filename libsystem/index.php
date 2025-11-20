@@ -184,23 +184,32 @@ include 'includes/scripts.php';
   <div class="row g-4">
     
     <!-- LEFT COLUMN: Quick Links -->
-    <div class="col-lg-3">
-      <?php if(isset($_SESSION['student']) || isset($_SESSION['faculty']) || isset($_SESSION['admin'])): ?>
-      <div class="quick-links-panel">
-        <h5 class="text-success mb-3">Quick Links</h5>
-        <a href="https://bsu.edu.ph/" class="quick-link-item">
-          BSU Official Website
-        </a>
-        <a href="#" class="quick-link-item" data-bs-toggle="modal" data-bs-target="#CalibriModal">
-          Calibri E-book Management
-        </a>
-        <a href="#" class="quick-link-item" data-bs-toggle="modal" data-bs-target="#onlineResourcesModal">
-          Online Open Resources
-        </a>
-        
-      </div>
-      <?php endif; ?>
-    </div>
+<div class="col-lg-3">
+  <?php if(isset($_SESSION['student']) || isset($_SESSION['faculty']) || isset($_SESSION['admin'])): ?>
+  <div class="quick-links-panel">
+    <h5 class="text-success mb-3">Quick Links</h5>
+
+    <a href="https://bsu.edu.ph/" class="quick-link-item">
+      BSU Official Website
+    </a>
+
+    <a href="#" class="quick-link-item" data-bs-toggle="modal" data-bs-target="#CalibriModal">
+      Calibri E-book Management
+    </a>
+
+    <a href="#" class="quick-link-item" data-bs-toggle="modal" data-bs-target="#onlineResourcesModal">
+      Online Open Resources
+    </a>
+
+    <!-- ⭐ NEW: Suggest a Book -->
+    <a href="suggest_book.php" class="quick-link-item">
+      Suggest a Book
+    </a>
+
+  </div>
+  <?php endif; ?>
+</div>
+
 
     <!-- CENTER COLUMN: Search, Stats, Announcements -->
     <div class="col-lg-6">
@@ -276,7 +285,7 @@ include 'includes/scripts.php';
             </div>
             <div class="login-body mt-3">
                 <form method="POST" action="login.php">
-                    <input type="text" class="form-control mb-2" name="user_id" placeholder="Student ID / Faculty ID / Admin Gmail" required>
+                    <input type="text" class="form-control mb-2" name="user_id" placeholder="user_id" required>
                     <input type="password" class="form-control mb-3" name="password" placeholder="Password" required>
                     <button type="submit" name="login" class="btn w-100" style="background:#004d00; color:#FFD700;">
                         Login

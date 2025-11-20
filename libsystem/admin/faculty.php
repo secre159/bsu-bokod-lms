@@ -65,7 +65,7 @@
         if(isset($_POST['addFaculty'])){
           $faculty_id = $_POST['faculty_id'];
           $firstname = $_POST['firstname'];
-          $firstname = $_POST['middlename'];
+          $middlename = $_POST['middlename'];
           $lastname = $_POST['lastname'];
           $department = $_POST['department'];
           $email = $_POST['email'];
@@ -177,7 +177,7 @@
 
                               <button type='button' class='btn btn-danger delete btn-flat' 
                                 data-id='".htmlspecialchars($row['id'])."' 
-                                data-name='".htmlspecialchars($row['firstname'].' '.$row['lastname'])."' 
+                                data-name='".htmlspecialchars($row['firstname'].' '.$row['middlename'].' '.$row['lastname'])."' 
                                 style='background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); color: white; border: none; border-radius: 5px; font-weight: 600;'>
                                 <i class='fa fa-trash'></i> Delete
                               </button>

@@ -33,21 +33,33 @@ include 'includes/header.php';
             <th>Course</th>
             <th>Student ID</th>
             <th>Firstname</th>
+            <th>Middlename</th>
             <th>Lastname</th>
+            <th>Email</th>
+            <th>Phone</th>
             <th>Tools</th>
           </thead>
           <tbody>
             <?php
-              $query = $conn->query("SELECT * FROM archived_students LIMIT 0, 25");
+              // Correct join with 'course' table
+              $query = $conn->query("
+                SELECT a.*, c.title AS course_title 
+                FROM archived_students a
+                LEFT JOIN course c ON a.course_id = c.id
+                LIMIT 0, 25
+              ");
 
               if($query->num_rows > 0){
                   while($row = $query->fetch_assoc()){
                       echo "
                       <tr>
-                        <td>".htmlspecialchars($row['course_id'])."</td>
+                        <td>".htmlspecialchars($row['course_title'])."</td>
                         <td>".htmlspecialchars($row['student_id'])."</td>
                         <td>".htmlspecialchars($row['firstname'])."</td>
+                        <td>".(!empty($row['middlename']) ? htmlspecialchars($row['middlename']) : '-')."</td>
                         <td>".htmlspecialchars($row['lastname'])."</td>
+                        <td>".(!empty($row['email']) ? htmlspecialchars($row['email']) : '-')."</td>
+                        <td>".(!empty($row['phone']) ? htmlspecialchars($row['phone']) : '-')."</td>
                         <td>
                           <!-- Restore Button -->
                           <form method='POST' action='restore_student.php' style='display:inline-block; margin-right:5px;'>
@@ -69,7 +81,7 @@ include 'includes/header.php';
                       ";
                   }
               } else {
-                  echo "<tr><td colspan='5' class='text-center'>No archived students found</td></tr>";
+                  echo "<tr><td colspan='8' class='text-center'>No archived students found</td></tr>";
               }
             ?>
           </tbody>

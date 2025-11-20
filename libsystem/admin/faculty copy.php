@@ -42,6 +42,7 @@
         if(isset($_POST['addFaculty'])){
           $faculty_id = $_POST['faculty_id'];
           $firstname = $_POST['firstname'];
+          $firstname = $_POST['middlename'];
           $lastname = $_POST['lastname'];
           $department = $_POST['department'];
           $email = $_POST['email'];
@@ -60,7 +61,7 @@
           } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("INSERT INTO faculty (faculty_id, password, firstname, lastname, phone, email, department, created_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssssss", $faculty_id, $hashed_password, $firstname, $lastname, $phone, $email, $department, $created_on);
+            $stmt->bind_param("ssssssss", $faculty_id, $hashed_password, $firstname, $middlename, $lastname, $phone, $email, $department, $created_on);
 
             if($stmt->execute()){
               $_SESSION['success'] = "Faculty member added successfully!";
@@ -101,6 +102,7 @@
                   <tr>
                     <th>Faculty ID</th>
                     <th>First Name</th>
+                     <th>Middle Name</th>
                     <th>Last Name</th>
                     <th>Department</th>
                     <th>Email</th>
@@ -118,6 +120,7 @@
                           <tr>
                             <td>".htmlspecialchars($row['faculty_id'])."</td>
                             <td>".htmlspecialchars($row['firstname'])."</td>
+                            <td>".htmlspecialchars($row['middlename'])."</td>
                             <td>".htmlspecialchars($row['lastname'])."</td>
                             <td>".htmlspecialchars($row['department'])."</td>
                             <td>".htmlspecialchars($row['email'])."</td>
@@ -180,6 +183,13 @@
               <label class="col-sm-3 control-label">First Name</label>
               <div class="col-sm-9">
                 <input type="text" class="form-control" name="firstname" required>
+              </div>
+            </div>
+            <!-- First Name -->
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Middle Name</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="middlename" required>
               </div>
             </div>
 
@@ -273,6 +283,14 @@
               <label class="col-sm-3 control-label">First Name</label>
               <div class="col-sm-9">
                 <input type="text" id="edit_firstname" class="form-control" name="firstname" required>
+              </div>
+            </div>
+
+             <!-- First Name -->
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Middle Name</label>
+              <div class="col-sm-9">
+                <input type="text" id="edit_firstname" class="form-control" name="middlename" required>
               </div>
             </div>
 
@@ -388,6 +406,7 @@ function getRow(id){
       $('#edit_id').val(response.id);
       $('#edit_faculty_id').val(response.faculty_id);
       $('#edit_firstname').val(response.firstname);
+       $('#edit_middlename').val(response.middlename);
       $('#edit_lastname').val(response.lastname);
       $('#edit_department').val(response.department);
       $('#edit_email').val(response.email);

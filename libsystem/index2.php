@@ -274,7 +274,7 @@ include 'includes/scripts.php';
 
     <div class="login-body mt-3">
       <form method="POST" action="login.php">
-        <input type="text" class="form-control mb-2" name="user_id" placeholder="Student ID / Faculty ID / Admin Gmail" required>
+        <input type="text" class="form-control mb-2" name="user_id" placeholder="user_id" required>
         <input type="password" class="form-control mb-3" name="password" placeholder="Password" required>
 
         <button type="submit" name="login" class="btn w-100" style="background:#004d00; color:#FFD700;">
@@ -309,6 +309,8 @@ include 'includes/scripts.php';
       </div>
       <div class="modal-body p-4">
         <div class="row g-4">
+
+        
           
           <!-- GALE Resource -->
           <div class="col-md-6">

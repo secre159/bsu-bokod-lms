@@ -1,69 +1,131 @@
 <?php
+// Start session and get current user
 include 'includes/session.php';
-include 'includes/header.php';
-include 'includes/navbar.php';
 include 'includes/conn.php';
-include 'includes/scripts.php';
-
-// Handle form submission
-if(isset($_POST['submit_suggestion'])) {
-    $user_id = $_SESSION['student'] ?? $_SESSION['teacher'] ?? '';
-    $user_type = isset($_SESSION['student']) ? 'Student' : 'Teacher';
-    $book_title = $conn->real_escape_string($_POST['book_title']);
-    $author = $conn->real_escape_string($_POST['author']);
-    $reason = $conn->real_escape_string($_POST['reason']);
-
-    $sql = "INSERT INTO book_suggestions (user_id, user_type, book_title, author, reason)
-            VALUES ('$user_id', '$user_type', '$book_title', '$author', '$reason')";
-    if($conn->query($sql)){
-        $_SESSION['success'] = "Your book suggestion has been submitted successfully!";
-    } else {
-        $_SESSION['error'] = "Failed to submit suggestion. Try again.";
-    }
-}
+include 'includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Suggest a Book</title>
-  <style>
-    .suggest-panel {
-        max-width: 600px;
-        margin: 30px auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        border: 2px solid #198754;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    }
-    .suggest-panel h3 { text-align: center; color: #004d00; margin-bottom: 20px; }
-    .suggest-panel .form-control { margin-bottom: 12px; }
-    .suggest-panel button { background: #004d00; color: #FFD700; }
-  </style>
-</head>
-<body>
-<main class="container">
+<body class="hold-transition skin-green sidebar-mini">
+<div class="wrapper">
 
-<div class="suggest-panel">
-    <h3>Suggest a Book</h3>
+  <?php include 'includes/navbar.php'; ?>
 
-    <?php if(isset($_SESSION['success'])): ?>
-        <div class="alert alert-success text-center"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
-    <?php endif; ?>
-    <?php if(isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger text-center"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
-    <?php endif; ?>
+  <div class="content-wrapper">
 
-    <form method="POST" action="">
-        <input type="text" class="form-control" name="book_title" placeholder="Book Title" required>
-        <input type="text" class="form-control" name="author" placeholder="Author">
-        <textarea class="form-control" name="reason" placeholder="Why do you suggest this book?" rows="4"></textarea>
-        <button type="submit" name="submit_suggestion" class="btn w-100">Submit Suggestion</button>
-    </form>
-</div>
+    <!-- Header -->
+    <section class="content-header" style="background-color:#006400; color:#FFD700; padding:15px; border-radius:5px; margin-bottom:20px;">
+      <h1 style="margin:0; text-align:center;">Suggest a Book</h1>
+    </section>
 
-</main>
+    <section class="content">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6"> <!-- Centered column -->
+
+            <?php
+            // Handle form submission
+            if(isset($_POST['submit'])){
+              $title = mysqli_real_escape_string($conn, $_POST['title']);
+              $author = mysqli_real_escape_string($conn, $_POST['author']);
+              $isbn = mysqli_real_escape_string($conn, $_POST['isbn']);
+              $subject = mysqli_real_escape_string($conn, $_POST['subject']);
+              $description = mysqli_real_escape_string($conn, $_POST['description']);
+
+              $suggested_by = '';
+              if(!empty($currentUser)){
+                $suggested_by = $currentUser['firstname'].' '.$currentUser['lastname'];
+              }
+
+              if(!empty($title) && !empty($author) && !empty($isbn) && !empty($subject)){
+                $sql = "INSERT INTO suggested_books (title, author, isbn, subject, description, suggested_by, status, date_created) 
+                        VALUES ('$title', '$author', '$isbn', '$subject', '$description', '$suggested_by', 'Pending', NOW())";
+
+                if(mysqli_query($conn, $sql)){
+                  echo "<div class='alert alert-success alert-dismissible'>
+                          <button type='button' class='close' data-dismiss='alert'>&times;</button>
+                          <i class='fa fa-check'></i> Book suggestion submitted successfully!
+                        </div>";
+                } else {
+                  echo "<div class='alert alert-danger alert-dismissible'>
+                          <button type='button' class='close' data-dismiss='alert'>&times;</button>
+                          <i class='fa fa-warning'></i> Error submitting suggestion.
+                        </div>";
+                }
+              } else {
+                echo "<div class='alert alert-warning alert-dismissible'>
+                        <button type='button' class='close' data-dismiss='alert'>&times;</button>
+                        <i class='fa fa-info-circle'></i> All fields except description are required.
+                      </div>";
+              }
+            }
+
+            // Fetch current user's suggestions for notifications
+            $suggested_by = $currentUser['firstname'].' '.$currentUser['lastname'];
+            $notif_sql = "SELECT * FROM suggested_books WHERE suggested_by='$suggested_by' ORDER BY date_created DESC";
+            $notif_query = mysqli_query($conn, $notif_sql);
+
+            if(mysqli_num_rows($notif_query) > 0){
+              echo "<div class='mb-4'>";
+              while($row = mysqli_fetch_assoc($notif_query)){
+                $status_color = 'secondary'; // Pending
+                if($row['status'] == 'Approved') $status_color = 'success';
+                elseif($row['status'] == 'Rejected') $status_color = 'danger';
+
+                echo "<div class='alert alert-$status_color alert-dismissible'>
+                        <button type='button' class='close' data-dismiss='alert'>&times;</button>
+                        <strong>".$row['title']."</strong> - Status: <strong>".$row['status']."</strong>
+                      </div>";
+              }
+              echo "</div>";
+            }
+            ?>
+
+            <div class="card" style="border-top: 4px solid #006400; padding:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius:10px;">
+              <h3 class="text-center mb-3">Submit Your Book Suggestion</h3>
+
+              <form method="POST">
+                <div class="form-group">
+                  <label>Book Title <span style="color:red">*</span></label>
+                  <input type="text" class="form-control" name="title" placeholder="Enter book title" required>
+                </div>
+
+                <div class="form-group">
+                  <label>Author <span style="color:red">*</span></label>
+                  <input type="text" class="form-control" name="author" placeholder="Enter author name" required>
+                </div>
+
+                <div class="form-group">
+                  <label>ISBN <span style="color:red">*</span></label>
+                  <input type="text" class="form-control" name="isbn" placeholder="Enter ISBN number" required>
+                </div>
+
+                <div class="form-group">
+                  <label>Subject <span style="color:red">*</span></label>
+                  <input type="text" class="form-control" name="subject" placeholder="Enter subject" required>
+                </div>
+
+                <div class="form-group">
+                  <label>Description (Optional)</label>
+                  <textarea class="form-control" name="description" rows="4" placeholder="Write a brief description..."></textarea>
+                </div>
+
+                <div class="text-center">
+                  <button type="submit" name="submit" class="btn btn-success">
+                    <i class="fa fa-paper-plane"></i> Submit Suggestion
+                  </button>
+                  <a href="index.php" class="btn btn-secondary">Cancel</a>
+                </div>
+
+              </form>
+            </div>
+
+          </div> <!-- col-md-6 -->
+        </div> <!-- row -->
+      </div> <!-- container -->
+    </section>
+  </div>
+
+<?php include 'includes/footer.php'; ?>
+<?php include 'includes/scripts.php'; ?>
 </body>
 </html>
