@@ -36,17 +36,22 @@ if(isset($_POST['apply_fixes'])){
         $errors[] = "✗ suggested_books table: " . $conn->error;
     }
     
-    // 2. Add archived column to faculty table
-    $check_column = $conn->query("SHOW COLUMNS FROM `faculty` LIKE 'archived'");
-    if($check_column->num_rows == 0){
-        $sql = "ALTER TABLE `faculty` ADD COLUMN `archived` tinyint(1) NOT NULL DEFAULT 0";
-        if($conn->query($sql)){
-            $success[] = "✓ Added 'archived' column to faculty table";
+    // 2. Add archived column to faculty table (if table exists)
+    $faculty_exists = $conn->query("SHOW TABLES LIKE 'faculty'");
+    if($faculty_exists && $faculty_exists->num_rows > 0){
+        $check_column = $conn->query("SHOW COLUMNS FROM `faculty` LIKE 'archived'");
+        if($check_column->num_rows == 0){
+            $sql = "ALTER TABLE `faculty` ADD COLUMN `archived` tinyint(1) NOT NULL DEFAULT 0";
+            if($conn->query($sql)){
+                $success[] = "✓ Added 'archived' column to faculty table";
+            } else {
+                $errors[] = "✗ faculty.archived column: " . $conn->error;
+            }
         } else {
-            $errors[] = "✗ faculty.archived column: " . $conn->error;
+            $success[] = "✓ faculty.archived column already exists";
         }
     } else {
-        $success[] = "✓ faculty.archived column already exists";
+        $errors[] = "✗ faculty table does not exist - restore database first";
     }
     
     // 3. Create archived_subject table
@@ -65,17 +70,22 @@ if(isset($_POST['apply_fixes'])){
         $errors[] = "✗ archived_subject table: " . $conn->error;
     }
     
-    // 4. Add created_at to calibre_books_archive
-    $check_column = $conn->query("SHOW COLUMNS FROM `calibre_books_archive` LIKE 'created_at'");
-    if($check_column->num_rows == 0){
-        $sql = "ALTER TABLE `calibre_books_archive` ADD COLUMN `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP";
-        if($conn->query($sql)){
-            $success[] = "✓ Added 'created_at' column to calibre_books_archive table";
+    // 4. Add created_at to calibre_books_archive (if table exists)
+    $calibre_archive_exists = $conn->query("SHOW TABLES LIKE 'calibre_books_archive'");
+    if($calibre_archive_exists && $calibre_archive_exists->num_rows > 0){
+        $check_column = $conn->query("SHOW COLUMNS FROM `calibre_books_archive` LIKE 'created_at'");
+        if($check_column->num_rows == 0){
+            $sql = "ALTER TABLE `calibre_books_archive` ADD COLUMN `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP";
+            if($conn->query($sql)){
+                $success[] = "✓ Added 'created_at' column to calibre_books_archive table";
+            } else {
+                $errors[] = "✗ calibre_books_archive.created_at column: " . $conn->error;
+            }
         } else {
-            $errors[] = "✗ calibre_books_archive.created_at column: " . $conn->error;
+            $success[] = "✓ calibre_books_archive.created_at column already exists";
         }
     } else {
-        $success[] = "✓ calibre_books_archive.created_at column already exists";
+        $errors[] = "✗ calibre_books_archive table does not exist - restore database first";
     }
     
     // Re-enable foreign key checks
