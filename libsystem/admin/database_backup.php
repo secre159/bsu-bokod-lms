@@ -68,10 +68,7 @@ if(isset($_POST['backup'])){
     exit();
 }
 
-// Include header AFTER backup logic
-include 'includes/header.php';
-
-// Handle restore
+// Handle restore BEFORE any HTML output
 if(isset($_POST['restore']) && isset($_FILES['sql_file'])){
     $sql_file = $_FILES['sql_file'];
     
@@ -114,6 +111,9 @@ if(isset($_POST['restore']) && isset($_FILES['sql_file'])){
     header('location: database_backup.php');
     exit();
 }
+
+// Include header AFTER backup/restore logic
+include 'includes/header.php';
 ?>
 
 <body class="hold-transition skin-green sidebar-mini">
