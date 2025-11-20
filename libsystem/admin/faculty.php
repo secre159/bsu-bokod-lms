@@ -159,14 +159,14 @@
                     while($row = $query->fetch_assoc()){
                       echo "
                         <tr style='transition: all 0.3s ease;'>
-                          <td style='border-right: 1px solid #f0f0f0; font-family: monospace; font-weight: 600;'><code>".htmlspecialchars($row['faculty_id'])."</code></td>
-                          <td style='border-right: 1px solid #f0f0f0; font-weight: 500;'>".htmlspecialchars($row['firstname'])."</td>
-                          <td style='border-right: 1px solid #f0f0f0; font-weight: 500;'>".htmlspecialchars($row['middlename'])."</td>
-                          <td style='border-right: 1px solid #f0f0f0; font-weight: 500;'>".htmlspecialchars($row['lastname'])."</td>
-                          <td style='border-right: 1px solid #f0f0f0; color: #006400; font-weight: 500;'>".htmlspecialchars($row['department'])."</td>
-                          <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['email'])."</small></td>
-                          <td style='border-right: 1px solid #f0f0f0;'>".htmlspecialchars($row['phone'])."</td>
-                          <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['created_on'])."</small></td>
+                          <td style='border-right: 1px solid #f0f0f0; font-family: monospace; font-weight: 600;'><code>".htmlspecialchars($row['faculty_id'] ?? '')."</code></td>
+                          <td style='border-right: 1px solid #f0f0f0; font-weight: 500;'>".htmlspecialchars($row['firstname'] ?? '')."</td>
+                          <td style='border-right: 1px solid #f0f0f0; font-weight: 500;'>".htmlspecialchars($row['middlename'] ?? '')."</td>
+                          <td style='border-right: 1px solid #f0f0f0; font-weight: 500;'>".htmlspecialchars($row['lastname'] ?? '')."</td>
+                          <td style='border-right: 1px solid #f0f0f0; color: #006400; font-weight: 500;'>".htmlspecialchars($row['department'] ?? '')."</td>
+                          <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['email'] ?? '')."</small></td>
+                          <td style='border-right: 1px solid #f0f0f0;'>".htmlspecialchars($row['phone'] ?? '')."</td>
+                          <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['created_on'] ?? '')."</small></td>
                           <td class='text-center'>
                             <div class='btn-group btn-group-sm' role='group'>
                               <button type='button' class='btn btn-warning edit btn-flat' 

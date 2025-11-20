@@ -114,8 +114,8 @@ if(isset($_GET['export']) && $_GET['export'] == 'word') {
     $word_content .= "<div class='stats'>";
     $word_content .= "<div class='stat-box'><span class='stat-number'>" . $stats['total_logs'] . "</span><br><span class='stat-label'>Total Logs</span></div>";
     $word_content .= "<div class='stat-box'><span class='stat-number'>" . $stats['unique_users'] . "</span><br><span class='stat-label'>Unique Users</span></div>";
-    $word_content .= "<div class='stat-box'><span class='stat-number'>" . ($stats['avg_duration'] ? gmdate("H:i:s", $stats['avg_duration']) : '00:00:00') . "</span><br><span class='stat-label'>Avg Session</span></div>";
-    $word_content .= "<div class='stat-box'><span class='stat-number'>" . ($stats['total_duration'] ? gmdate("H:i:s", $stats['total_duration']) : '00:00:00') . "</span><br><span class='stat-label'>Total Time</span></div>";
+    $word_content .= "<div class='stat-box'><span class='stat-number'>" . ($stats['avg_duration'] ? gmdate("H:i:s", (int)$stats['avg_duration']) : '00:00:00') . "</span><br><span class='stat-label'>Avg Session</span></div>";
+    $word_content .= "<div class='stat-box'><span class='stat-number'>" . ($stats['total_duration'] ? gmdate("H:i:s", (int)$stats['total_duration']) : '00:00:00') . "</span><br><span class='stat-label'>Total Time</span></div>";
     $word_content .= "</div>";
     
     // Active Filters
@@ -454,7 +454,7 @@ if(isset($_GET['export']) && $_GET['export'] == 'word') {
                         <div class="info-box-content" style="margin-left: 80px; padding-top: 5px;">
                             <span class="info-box-text" style="font-weight: 600; color: #006400; font-size: 14px; display: block;">Avg Session</span>
                             <span class="info-box-number" style="color: #006400; font-weight: 700; font-size: 18px; display: block;">
-                                <?= $stats['avg_duration'] ? gmdate("H:i:s", $stats['avg_duration']) : '00:00:00' ?>
+                                <?= $stats['avg_duration'] ? gmdate("H:i:s", (int)$stats['avg_duration']) : '00:00:00' ?>
                             </span>
                         </div>
                     </div>
@@ -467,7 +467,7 @@ if(isset($_GET['export']) && $_GET['export'] == 'word') {
                         <div class="info-box-content" style="margin-left: 80px; padding-top: 5px;">
                             <span class="info-box-text" style="font-weight: 600; color: #006400; font-size: 14px; display: block;">Total Time</span>
                             <span class="info-box-number" style="color: #006400; font-weight: 700; font-size: 18px; display: block;">
-                                <?= $stats['total_duration'] ? gmdate("H:i:s", $stats['total_duration']) : '00:00:00' ?>
+                                <?= $stats['total_duration'] ? gmdate("H:i:s", (int)$stats['total_duration']) : '00:00:00' ?>
                             </span>
                         </div>
                     </div>
@@ -485,11 +485,11 @@ if(isset($_GET['export']) && $_GET['export'] == 'word') {
                     <span class="print-stat-label">Unique Users</span>
                 </div>
                 <div class="print-stat-box">
-                    <span class="print-stat-number"><?= $stats['avg_duration'] ? gmdate("H:i:s", $stats['avg_duration']) : '00:00:00' ?></span>
+                    <span class="print-stat-number"><?= $stats['avg_duration'] ? gmdate("H:i:s", (int)$stats['avg_duration']) : '00:00:00' ?></span>
                     <span class="print-stat-label">Avg Session</span>
                 </div>
                 <div class="print-stat-box">
-                    <span class="print-stat-number"><?= $stats['total_duration'] ? gmdate("H:i:s", $stats['total_duration']) : '00:00:00' ?></span>
+                    <span class="print-stat-number"><?= $stats['total_duration'] ? gmdate("H:i:s", (int)$stats['total_duration']) : '00:00:00' ?></span>
                     <span class="print-stat-label">Total Time</span>
                 </div>
             </div>
