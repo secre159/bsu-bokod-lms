@@ -83,6 +83,50 @@ echo "File loaded. Starting restore...\n\n";
 $conn->query("SET FOREIGN_KEY_CHECKS=0");
 echo "- Disabled foreign key checks\n";
 
+// Preflight: align schema to columns referenced in backup INSERTs
+// This helps when the backup references columns that don't exist yet (e.g., books.description)
+echo "- Preflight: aligning schema to backup columns...\n";
+$matches = [];
+$tables_to_align = [];
+// Capture up to 100 distinct INSERT targets with explicit column lists
+if (preg_match_all('/INSERT\s+INTO\s+`([^`]+)`\s*\(([^)]+)\)/i', $file_content, $matches, PREG_SET_ORDER)) {
+    foreach ($matches as $m) {
+        $t = $m[1];
+        if (!isset($tables_to_align[$t])) {
+            // Parse columns from the captured group
+            $cols = array_map(function($c){
+                return trim(str_replace(['`','"','\''], '', $c));
+            }, explode(',', $m[2]));
+            $tables_to_align[$t] = array_unique(array_filter($cols));
+            if (count($tables_to_align) >= 100) break;
+        }
+    }
+}
+
+foreach ($tables_to_align as $table_name => $cols) {
+    // Skip if table doesn't exist; CREATE TABLE in backup will handle it
+    $res = $conn->query("SHOW TABLES LIKE '".$conn->real_escape_string($table_name)."'");
+    if ($res && $res->num_rows === 0) continue;
+    // Get existing columns
+    $existing = [];
+    $res = $conn->query("SHOW COLUMNS FROM `{$table_name}`");
+    if ($res) {
+        while ($r = $res->fetch_assoc()) $existing[] = $r['Field'];
+    }
+    $missing = array_values(array_diff($cols, $existing));
+    foreach ($missing as $col) {
+        // Add as TEXT NULL by default (generic, safe for most types)
+        $sql = "ALTER TABLE `{$table_name}` ADD COLUMN `{$col}` TEXT NULL";
+        if ($conn->query($sql)) {
+            echo "  Added missing column {$table_name}.{$col}\n";
+        } else {
+            echo "  Warning: could not add {$table_name}.{$col}: ".$conn->error."\n";
+        }
+    }
+}
+
+echo "- Preflight complete\n";
+
 // Get all tables and truncate them first to avoid duplicates
 echo "- Clearing existing data...\n";
 $result = $conn->query("SHOW TABLES");
