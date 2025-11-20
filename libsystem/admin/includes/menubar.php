@@ -152,9 +152,9 @@
       <li class="header" style="background: linear-gradient(135deg, #004d00 0%, #006400 100%); color: #FFD700; font-weight: 700; padding: 12px 15px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">SYSTEM</li>
 
       <li>
-        <a href="database_backup.php">
-          <i class="fa fa-database" style="color: #51ff00ff;"></i>
-          <span style="font-weight: 500;">Backup & Restore</span>
+        <a href="backup_manager.php">
+          <i class="fa fa-hdd-o" style="color: #51ff00ff;"></i>
+          <span style="font-weight: 500;">Backup Manager</span>
         </a>
       </li>
 

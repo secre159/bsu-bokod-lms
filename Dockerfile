@@ -43,6 +43,9 @@ COPY . /var/www/html/
 # Install Composer dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+# Create backup storage directory (will be mounted from Render Disk)
+RUN mkdir -p /var/backups && chown -R www-data:www-data /var/backups && chmod -R 755 /var/backups
+
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
