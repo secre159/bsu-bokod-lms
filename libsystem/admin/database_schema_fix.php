@@ -177,12 +177,20 @@ include 'includes/header.php';
                     'exists' => $check->num_rows > 0
                 );
                 
-                // Check faculty.archived column
-                $check = $conn->query("SHOW COLUMNS FROM `faculty` LIKE 'archived'");
-                $status[] = array(
-                    'name' => 'faculty.archived column',
-                    'exists' => $check->num_rows > 0
-                );
+                // Check faculty.archived column (only if faculty table exists)
+                $faculty_exists = $conn->query("SHOW TABLES LIKE 'faculty'");
+                if($faculty_exists && $faculty_exists->num_rows > 0){
+                    $check = $conn->query("SHOW COLUMNS FROM `faculty` LIKE 'archived'");
+                    $status[] = array(
+                        'name' => 'faculty.archived column',
+                        'exists' => $check && $check->num_rows > 0
+                    );
+                } else {
+                    $status[] = array(
+                        'name' => 'faculty table',
+                        'exists' => false
+                    );
+                }
                 
                 // Check archived_subject table
                 $check = $conn->query("SHOW TABLES LIKE 'archived_subject'");
@@ -191,12 +199,20 @@ include 'includes/header.php';
                     'exists' => $check->num_rows > 0
                 );
                 
-                // Check calibre_books_archive.created_at column
-                $check = $conn->query("SHOW COLUMNS FROM `calibre_books_archive` LIKE 'created_at'");
-                $status[] = array(
-                    'name' => 'calibre_books_archive.created_at column',
-                    'exists' => $check->num_rows > 0
-                );
+                // Check calibre_books_archive.created_at column (only if table exists)
+                $calibre_archive_exists = $conn->query("SHOW TABLES LIKE 'calibre_books_archive'");
+                if($calibre_archive_exists && $calibre_archive_exists->num_rows > 0){
+                    $check = $conn->query("SHOW COLUMNS FROM `calibre_books_archive` LIKE 'created_at'");
+                    $status[] = array(
+                        'name' => 'calibre_books_archive.created_at column',
+                        'exists' => $check && $check->num_rows > 0
+                    );
+                } else {
+                    $status[] = array(
+                        'name' => 'calibre_books_archive table',
+                        'exists' => false
+                    );
+                }
                 
                 $all_exist = true;
                 foreach($status as $item){
