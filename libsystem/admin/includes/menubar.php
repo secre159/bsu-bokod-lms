@@ -158,6 +158,13 @@
         </a>
       </li>
 
+      <li>
+        <a href="database_schema_fix.php">
+          <i class="fa fa-wrench" style="color: #51ff00ff;"></i>
+          <span style="font-weight: 500;">Schema Fix</span>
+        </a>
+      </li>
+
     </ul>
 
   </section>

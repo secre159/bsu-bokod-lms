@@ -7,7 +7,6 @@ if(!isset($_SESSION['admin'])){
 }
 
 include 'includes/conn.php';
-include 'includes/header.php';
 
 // Get database credentials from environment or use defaults
 $db_host = getenv('DB_HOST') ?: 'localhost';
@@ -15,7 +14,7 @@ $db_user = getenv('DB_USER') ?: 'root';
 $db_pass = getenv('DB_PASSWORD') ?: '';
 $db_name = getenv('DB_NAME') ?: 'libsystem4';
 
-// Handle backup download
+// Handle backup download BEFORE any HTML output
 if(isset($_POST['backup'])){
     $backup_file = 'backup_' . $db_name . '_' . date('Y-m-d_H-i-s') . '.sql';
     
@@ -68,6 +67,9 @@ if(isset($_POST['backup'])){
     echo $sql_dump;
     exit();
 }
+
+// Include header AFTER backup logic
+include 'includes/header.php';
 
 // Handle restore
 if(isset($_POST['restore']) && isset($_FILES['sql_file'])){
