@@ -39,21 +39,46 @@ if(isset($_POST['backup'])){
         $create_table = $conn->query("SHOW CREATE TABLE `{$table}`")->fetch_array();
         $sql_dump .= $create_table[1] . ";\n\n";
         
-        // Insert data
+        // Insert data - use extended INSERT for better compatibility
         $rows = $conn->query("SELECT * FROM `{$table}`");
         if($rows->num_rows > 0){
+            // Get column names
+            $fields = $rows->fetch_fields();
+            $column_names = array();
+            foreach($fields as $field){
+                $column_names[] = "`{$field->name}`";
+            }
+            
+            $insert_base = "INSERT INTO `{$table}` (" . implode(',', $column_names) . ") VALUES ";
+            $insert_values = array();
+            $row_count = 0;
+            
             while($row = $rows->fetch_assoc()){
-                $sql_dump .= "INSERT INTO `{$table}` VALUES(";
                 $values = array();
                 foreach($row as $value){
                     if($value === null){
                         $values[] = "NULL";
                     } else {
-                        $values[] = "'" . $conn->real_escape_string($value) . "'";
+                        // Use addslashes for better escaping of quotes and backslashes
+                        $values[] = "'" . addslashes($value) . "'";
                     }
                 }
-                $sql_dump .= implode(',', $values) . ");\n";
+                $insert_values[] = "(" . implode(',', $values) . ")";
+                $row_count++;
+                
+                // Insert every 100 rows to avoid too long statements
+                if($row_count >= 100){
+                    $sql_dump .= $insert_base . implode(',', $insert_values) . ";\n";
+                    $insert_values = array();
+                    $row_count = 0;
+                }
             }
+            
+            // Insert remaining rows
+            if(count($insert_values) > 0){
+                $sql_dump .= $insert_base . implode(',', $insert_values) . ";\n";
+            }
+            
             $sql_dump .= "\n";
         }
     }
