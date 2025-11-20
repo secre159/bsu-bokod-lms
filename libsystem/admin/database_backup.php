@@ -242,13 +242,21 @@ include 'includes/header.php';
                 <i class="fa fa-exclamation-triangle"></i> Warning: This will replace ALL existing data!
               </p>
               
+              <!-- Upload Limit Info -->
+              <div style="background: #f8fff8; padding: 15px; border-radius: 8px; border: 1px solid #006400; margin-bottom: 20px;">
+                <h4 style="color: #006400; margin: 0 0 10px 0; font-size: 16px;"><i class="fa fa-info-circle"></i> Upload Limits</h4>
+                <p style="margin: 5px 0;"><strong>Max File Size:</strong> <?php echo ini_get('upload_max_filesize'); ?></p>
+                <p style="margin: 5px 0;"><strong>Max Post Size:</strong> <?php echo ini_get('post_max_size'); ?></p>
+                <p style="margin: 5px 0;"><strong>Memory Limit:</strong> <?php echo ini_get('memory_limit'); ?></p>
+              </div>
+              
               <form method="POST" enctype="multipart/form-data" onsubmit="return confirm('Are you sure you want to restore the database? This will REPLACE ALL current data and cannot be undone!');">
                 <div class="form-group">
                   <label style="font-weight: 600; color: #006400; margin-bottom: 10px;">
                     <i class="fa fa-file"></i> Select SQL Backup File
                   </label>
                   <input type="file" name="sql_file" accept=".sql" required class="form-control" style="border: 2px solid #006400; border-radius: 6px; padding: 10px;">
-                  <small style="color: #666; display: block; margin-top: 5px;">Only .sql files are accepted</small>
+                  <small style="color: #666; display: block; margin-top: 5px;">Only .sql files are accepted. Max size: <?php echo ini_get('upload_max_filesize'); ?></small>
                 </div>
                 
                 <button type="submit" name="restore" class="btn btn-block" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); color: white; border: none; border-radius: 6px; font-weight: 600; padding: 12px 20px; font-size: 16px; box-shadow: 0 2px 4px rgba(255,0,0,0.2);">
