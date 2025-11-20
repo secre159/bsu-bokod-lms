@@ -63,7 +63,8 @@ if(isset($_POST['create_backup'])){
                     if($value === null){
                         $values[] = "NULL";
                     } else {
-                        $values[] = "'" . addslashes($value) . "'";
+                        // Use mysqli_real_escape_string for proper MySQL escaping
+                        $values[] = "'" . $conn->real_escape_string($value) . "'";
                     }
                 }
                 $insert_values[] = "(" . implode(',', $values) . ")";
