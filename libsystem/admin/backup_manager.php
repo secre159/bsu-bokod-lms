@@ -26,6 +26,14 @@ $db_name = getenv('DB_NAME') ?: 'libsystem4';
 if(isset($_POST['create_backup'])){
     $backup_file = $backup_dir . 'backup_' . $db_name . '_' . date('Y-m-d_H-i-s') . '.sql';
     
+    // Open file handle for writing incrementally (avoids memory issues)
+    $handle = fopen($backup_file, 'w');
+    if(!$handle){
+        $_SESSION['error'] = "Failed to create backup file.";
+        header('location: backup_manager.php');
+        exit();
+    }
+    
     // Get all tables
     $tables = array();
     $result = $conn->query("SHOW TABLES");
@@ -33,17 +41,18 @@ if(isset($_POST['create_backup'])){
         $tables[] = $row[0];
     }
     
-    $sql_dump = "-- Database Backup\n";
-    $sql_dump .= "-- Database: {$db_name}\n";
-    $sql_dump .= "-- Date: " . date('Y-m-d H:i:s') . "\n\n";
-    $sql_dump .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
+    // Write header
+    fwrite($handle, "-- Database Backup\n");
+    fwrite($handle, "-- Database: {$db_name}\n");
+    fwrite($handle, "-- Date: " . date('Y-m-d H:i:s') . "\n\n");
+    fwrite($handle, "SET FOREIGN_KEY_CHECKS=0;\n\n");
     
-    // Loop through tables
+    // Loop through tables and write directly to file
     foreach($tables as $table){
-        $sql_dump .= "DROP TABLE IF EXISTS `{$table}`;\n";
+        fwrite($handle, "DROP TABLE IF EXISTS `{$table}`;\n");
         
         $create_table = $conn->query("SHOW CREATE TABLE `{$table}`")->fetch_array();
-        $sql_dump .= $create_table[1] . ";\n\n";
+        fwrite($handle, $create_table[1] . ";\n\n");
         
         $rows = $conn->query("SELECT * FROM `{$table}`");
         if($rows->num_rows > 0){
@@ -63,35 +72,34 @@ if(isset($_POST['create_backup'])){
                     if($value === null){
                         $values[] = "NULL";
                     } else {
-                        // Use mysqli_real_escape_string for proper MySQL escaping
                         $values[] = "'" . $conn->real_escape_string($value) . "'";
                     }
                 }
                 $insert_values[] = "(" . implode(',', $values) . ")";
                 $row_count++;
                 
+                // Write to disk every 100 rows to avoid memory buildup
                 if($row_count >= 100){
-                    $sql_dump .= $insert_base . implode(',', $insert_values) . ";\n";
+                    fwrite($handle, $insert_base . implode(',', $insert_values) . ";\n");
                     $insert_values = array();
                     $row_count = 0;
                 }
             }
             
+            // Write remaining rows
             if(count($insert_values) > 0){
-                $sql_dump .= $insert_base . implode(',', $insert_values) . ";\n";
+                fwrite($handle, $insert_base . implode(',', $insert_values) . ";\n");
             }
             
-            $sql_dump .= "\n";
+            fwrite($handle, "\n");
         }
     }
     
-    $sql_dump .= "SET FOREIGN_KEY_CHECKS=1;\n";
+    fwrite($handle, "SET FOREIGN_KEY_CHECKS=1;\n");
+    fclose($handle);
     
-    if(file_put_contents($backup_file, $sql_dump)){
-        $_SESSION['success'] = "Backup created successfully: " . basename($backup_file);
-    } else {
-        $_SESSION['error'] = "Failed to create backup file.";
-    }
+    $_SESSION['success'] = "Backup created successfully: " . basename($backup_file) . " (" . number_format(filesize($backup_file) / 1024 / 1024, 2) . " MB)";
+    
     
     header('location: backup_manager.php');
     exit();
