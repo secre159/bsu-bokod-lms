@@ -92,11 +92,12 @@ if ($result->num_rows > 0) {
     }
     $stmt->close();
 } else {
-    // Insert new admin with default photo
+    // Insert new admin with default photo and timestamp
     echo "Creating new admin account...\n";
     $default_photo = 'profile.jpg'; // Default photo
-    $stmt = $conn->prepare("INSERT INTO admin (gmail, password, firstname, lastname, photo) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $admin_email, $hashed_password, $admin_firstname, $admin_lastname, $default_photo);
+    $created_on = date('Y-m-d H:i:s'); // Current timestamp
+    $stmt = $conn->prepare("INSERT INTO admin (gmail, password, firstname, lastname, photo, created_on) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssss", $admin_email, $hashed_password, $admin_firstname, $admin_lastname, $default_photo, $created_on);
     
     if ($stmt->execute()) {
         echo "✓ Admin account created successfully!\n";
