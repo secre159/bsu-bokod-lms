@@ -69,43 +69,67 @@ if(isset($_POST['backup'])){
 }
 
 // Handle restore BEFORE any HTML output
-if(isset($_POST['restore']) && isset($_FILES['sql_file'])){
-    $sql_file = $_FILES['sql_file'];
-    
-    if($sql_file['error'] == 0){
-        $file_content = file_get_contents($sql_file['tmp_name']);
+if(isset($_POST['restore'])){
+    // Check if file was uploaded
+    if(!isset($_FILES['sql_file']) || $_FILES['sql_file']['error'] !== 0){
+        // Detailed error messages
+        $error_messages = array(
+            UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize in php.ini',
+            UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE in HTML form',
+            UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
+            UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary upload folder',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+            UPLOAD_ERR_EXTENSION => 'Upload stopped by PHP extension'
+        );
         
-        // Disable foreign key checks
-        $conn->query("SET FOREIGN_KEY_CHECKS=0");
+        $error_code = isset($_FILES['sql_file']) ? $_FILES['sql_file']['error'] : UPLOAD_ERR_NO_FILE;
+        $error_msg = isset($error_messages[$error_code]) ? $error_messages[$error_code] : 'Unknown upload error';
+        $_SESSION['error'] = "File upload failed: {$error_msg} (Error code: {$error_code})";
+    } else {
+        $sql_file = $_FILES['sql_file'];
         
-        // Split by semicolon and execute each statement
-        $statements = explode(';', $file_content);
-        $success_count = 0;
-        $error_count = 0;
-        $errors = array();
-        
-        foreach($statements as $statement){
-            $statement = trim($statement);
-            if(!empty($statement) && !preg_match('/^--/', $statement)){
-                if($conn->query($statement)){
-                    $success_count++;
+        // Validate file extension
+        $file_ext = strtolower(pathinfo($sql_file['name'], PATHINFO_EXTENSION));
+        if($file_ext !== 'sql'){
+            $_SESSION['error'] = "Invalid file type. Only .sql files are allowed. You uploaded: .{$file_ext}";
+        } else {
+            $file_content = file_get_contents($sql_file['tmp_name']);
+            
+            if($file_content === false){
+                $_SESSION['error'] = "Failed to read uploaded file.";
+            } else {
+                // Disable foreign key checks
+                $conn->query("SET FOREIGN_KEY_CHECKS=0");
+                
+                // Split by semicolon and execute each statement
+                $statements = explode(';', $file_content);
+                $success_count = 0;
+                $error_count = 0;
+                $errors = array();
+                
+                foreach($statements as $statement){
+                    $statement = trim($statement);
+                    if(!empty($statement) && !preg_match('/^--/', $statement)){
+                        if($conn->query($statement)){
+                            $success_count++;
+                        } else {
+                            $error_count++;
+                            $errors[] = $conn->error;
+                        }
+                    }
+                }
+                
+                // Re-enable foreign key checks
+                $conn->query("SET FOREIGN_KEY_CHECKS=1");
+                
+                if($error_count > 0){
+                    $_SESSION['error'] = "Restore completed with errors: {$error_count} failed queries. First error: " . $errors[0];
                 } else {
-                    $error_count++;
-                    $errors[] = $conn->error;
+                    $_SESSION['success'] = "Database restored successfully! Executed {$success_count} queries.";
                 }
             }
         }
-        
-        // Re-enable foreign key checks
-        $conn->query("SET FOREIGN_KEY_CHECKS=1");
-        
-        if($error_count > 0){
-            $_SESSION['error'] = "Restore completed with errors: {$error_count} failed queries. First error: " . $errors[0];
-        } else {
-            $_SESSION['success'] = "Database restored successfully! Executed {$success_count} queries.";
-        }
-    } else {
-        $_SESSION['error'] = "Error uploading file.";
     }
     
     header('location: database_backup.php');
