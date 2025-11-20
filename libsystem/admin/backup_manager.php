@@ -152,34 +152,35 @@ if(isset($_POST['restore_backup'])){
             $conn->query("TRUNCATE TABLE `{$row[0]}`");
         }
         
-        // Execute backup
-        $statements = explode(';', $file_content);
-        $success_count = 0;
-        $error_count = 0;
-        $errors = array();
+        // Execute backup using multi_query (handles semicolons in data properly)
+        $success = true;
+        $error_msg = '';
         
-        foreach($statements as $statement){
-            $statement = trim($statement);
-            if(!empty($statement) && !preg_match('/^--/', $statement)){
-                if($conn->query($statement)){
-                    $success_count++;
-                } else {
-                    $error_count++;
-                    if(count($errors) < 5){ // Store first 5 errors
-                        $errors[] = $conn->error;
-                    }
+        if($conn->multi_query($file_content)){
+            do {
+                // Store and free results
+                if($result = $conn->store_result()){
+                    $result->free();
                 }
-            }
+                // Check for errors after each query
+                if($conn->errno){
+                    $success = false;
+                    $error_msg = $conn->error;
+                    break;
+                }
+            } while($conn->more_results() && $conn->next_result());
+        } else {
+            $success = false;
+            $error_msg = $conn->error;
         }
         
         $conn->query("SET FOREIGN_KEY_CHECKS=1");
         $conn->query("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
         
-        if($error_count > 0){
-            $error_detail = count($errors) > 0 ? "First error: " . $errors[0] : "";
-            $_SESSION['error'] = "Restore completed with {$error_count} errors. {$error_detail}";
+        if(!$success){
+            $_SESSION['error'] = "Restore failed: " . $error_msg;
         } else {
-            $_SESSION['success'] = "Database restored successfully! ({$success_count} queries executed)";
+            $_SESSION['success'] = "Database restored successfully!";
         }
     } else {
         $_SESSION['error'] = "Backup file not found.";
