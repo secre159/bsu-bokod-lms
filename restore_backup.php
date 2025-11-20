@@ -83,6 +83,19 @@ echo "File loaded. Starting restore...\n\n";
 $conn->query("SET FOREIGN_KEY_CHECKS=0");
 echo "- Disabled foreign key checks\n";
 
+// Get all tables and truncate them first to avoid duplicates
+echo "- Clearing existing data...\n";
+$result = $conn->query("SHOW TABLES");
+$tables = array();
+while($row = $result->fetch_array()){
+    $tables[] = $row[0];
+}
+
+foreach($tables as $table){
+    $conn->query("TRUNCATE TABLE `{$table}`");
+}
+echo "  Cleared " . count($tables) . " tables\n";
+
 // Split by semicolon and execute each statement
 $statements = explode(';', $file_content);
 $total_statements = count($statements);

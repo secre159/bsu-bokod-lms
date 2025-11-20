@@ -102,6 +102,18 @@ if(isset($_POST['restore'])){
                 // Disable foreign key checks
                 $conn->query("SET FOREIGN_KEY_CHECKS=0");
                 
+                // Get all table names and truncate them first to avoid duplicates
+                $result = $conn->query("SHOW TABLES");
+                $tables = array();
+                while($row = $result->fetch_array()){
+                    $tables[] = $row[0];
+                }
+                
+                // Truncate all tables
+                foreach($tables as $table){
+                    $conn->query("TRUNCATE TABLE `{$table}`");
+                }
+                
                 // Split by semicolon and execute each statement
                 $statements = explode(';', $file_content);
                 $success_count = 0;
