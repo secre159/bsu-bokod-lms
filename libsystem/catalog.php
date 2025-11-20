@@ -383,15 +383,15 @@ body {
                     }
 
                     echo "
-                    <tr class='$statusClass' data-type='physical' data-status='$statusText' data-category='".htmlspecialchars($row['categories'])."' data-location='".htmlspecialchars($row['location'])."'>
+                    <tr class='$statusClass' data-type='physical' data-status='$statusText' data-category='".htmlspecialchars($row['categories'] ?? '')."' data-location='".htmlspecialchars($row['location'] ?? '')."'>
                         <td class='text-center fw-bold'>{$i}</td>
-                        <td class='fw-semibold'>".htmlspecialchars($row['title'])."</td>
+                        <td class='fw-semibold'>".htmlspecialchars($row['title'] ?? '')."</td>
                         <td>
-                          <div class='mb-1'>".htmlspecialchars($row['author'])."</div>
+                          <div class='mb-1'>".htmlspecialchars($row['author'] ?? '')."</div>
                           <small class='book-type-indicator'><i class='fa fa-book me-1'></i>Physical</small>
                         </td>
-                        <td class='text-center'>".htmlspecialchars($row['call_no'] ?: '-')."</td>
-                        <td>".htmlspecialchars($row['location'] ?: '-')."</td>
+                        <td class='text-center'>".htmlspecialchars($row['call_no'] ?? '-')."</td>
+                        <td>".htmlspecialchars($row['location'] ?? '-')."</td>
                         <td><div class='badge-container'>".render_badges_with_more($categories,'bg-light')."</div></td>
                         <td><div class='badge-container'>".render_badges_with_more($topics,'bg-info')."</div></td>
                         <td class='text-center'>$statusBadge</td>
@@ -429,13 +429,13 @@ body {
                     echo "
                     <tr class='status-available' data-type='digital' data-status='available' data-category='-' data-location='digital'>
                         <td class='text-center fw-bold'>{$i}</td>
-                        <td class='fw-semibold'>".htmlspecialchars($row['title'])."</td>
+                        <td class='fw-semibold'>".htmlspecialchars($row['title'] ?? '')."</td>
                         <td>
-                            <div class='mb-1'>".htmlspecialchars($row['author'])."</div>
+                            <div class='mb-1'>".htmlspecialchars($row['author'] ?? '')."</div>
                             <small class='book-type-indicator'><i class='fa fa-file-pdf me-1'></i>Digital</small>
                         </td>
                         <td class='text-center'>—</td>
-                        <td><small class='text-muted'>".htmlspecialchars($location)."</small></td>
+                        <td><small class='text-muted'>".htmlspecialchars($location ?? '')."</small></td>
                         <td>-</td>
                         <td><div class='badge-container'>".render_badges_with_more($topics,'bg-info')."</div></td>
                         <td class='text-center'>$status</td>
