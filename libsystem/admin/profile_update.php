@@ -24,7 +24,7 @@ if(isset($_POST['save'])){
     $photo = $_FILES['photo']['name'];
 
     // Check current password (plain text)
-    if($curr_password === $user['password']){
+    if(trim($curr_password) === trim($user['password'])){
 
         // Handle photo upload
         if(!empty($photo)){
