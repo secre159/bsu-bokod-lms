@@ -22,17 +22,39 @@ if($add) {
     echo "<p style='color: red;'>❌ Error: " . $conn->error . "</p>";
 }
 
-// Check foreign keys
-echo "<p>Step 3: Checking foreign key constraints...</p>";
-$fks = $conn->query("SELECT * FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_NAME='book_subject_map' AND TABLE_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='FOREIGN KEY'");
-if($fks && $fks->num_rows > 0) {
-    echo "<p>Foreign keys found:</p><ul>";
-    while($fk = $fks->fetch_assoc()) {
-        echo "<li>{$fk['CONSTRAINT_NAME']}</li>";
-    }
-    echo "</ul>";
+// Check and fix foreign keys
+echo "<p>Step 3: Checking and fixing foreign key constraints...</p>";
+
+// Drop old foreign keys
+echo "<p>Dropping old foreign keys...</p>";
+$drop_fk1 = $conn->query("ALTER TABLE book_subject_map DROP FOREIGN KEY book_subject_map_ibfk_1");
+if($drop_fk1) {
+    echo "<p style='color: green;'>✅ Dropped book_subject_map_ibfk_1</p>";
 } else {
-    echo "<p>No foreign keys found</p>";
+    echo "<p style='color: orange;'>⚠️ Could not drop ibfk_1: " . $conn->error . "</p>";
+}
+
+$drop_fk2 = $conn->query("ALTER TABLE book_subject_map DROP FOREIGN KEY book_subject_map_ibfk_2");
+if($drop_fk2) {
+    echo "<p style='color: green;'>✅ Dropped book_subject_map_ibfk_2</p>";
+} else {
+    echo "<p style='color: orange;'>⚠️ Could not drop ibfk_2: " . $conn->error . "</p>";
+}
+
+// Add correct foreign keys pointing to 'books' and 'subject' tables
+echo "<p>Adding correct foreign keys...</p>";
+$add_fk1 = $conn->query("ALTER TABLE book_subject_map ADD CONSTRAINT book_subject_map_ibfk_1 FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE");
+if($add_fk1) {
+    echo "<p style='color: green;'>✅ Added FK: book_id -> books(id)</p>";
+} else {
+    echo "<p style='color: red;'>❌ Error: " . $conn->error . "</p>";
+}
+
+$add_fk2 = $conn->query("ALTER TABLE book_subject_map ADD CONSTRAINT book_subject_map_ibfk_2 FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE");
+if($add_fk2) {
+    echo "<p style='color: green;'>✅ Added FK: subject_id -> subject(id)</p>";
+} else {
+    echo "<p style='color: red;'>❌ Error: " . $conn->error . "</p>";
 }
 
 // Test without IGNORE to see real error
