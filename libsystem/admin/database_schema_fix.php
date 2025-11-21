@@ -157,6 +157,56 @@ if(isset($_POST['apply_fixes'])){
         $errors[] = "✗ archived_students table does not exist - restore database first";
     }
     
+    // 8. Fix book_subject_map foreign keys (if table exists)
+    $book_subject_map_exists = $conn->query("SHOW TABLES LIKE 'book_subject_map'");
+    if($book_subject_map_exists && $book_subject_map_exists->num_rows > 0){
+        // Check if wrong foreign key exists
+        $check_fk = $conn->query("SELECT * FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'book_subject_map' AND CONSTRAINT_NAME = 'book_subject_map_ibfk_1'");
+        if($check_fk && $check_fk->num_rows > 0){
+            // Check if it points to wrong table
+            $fk_info = $conn->query("SELECT REFERENCED_TABLE_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'book_subject_map' AND CONSTRAINT_NAME = 'book_subject_map_ibfk_1'");
+            if($fk_info && $fk_info->num_rows > 0){
+                $fk_row = $fk_info->fetch_assoc();
+                if($fk_row['REFERENCED_TABLE_NAME'] == 'books_main'){
+                    // Drop incorrect foreign key
+                    $conn->query("ALTER TABLE book_subject_map DROP FOREIGN KEY book_subject_map_ibfk_1");
+                    // Add correct foreign key
+                    $conn->query("ALTER TABLE book_subject_map ADD CONSTRAINT book_subject_map_ibfk_1 FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE");
+                    $success[] = "✓ Fixed book_subject_map foreign key to point to books table";
+                } else {
+                    $success[] = "✓ book_subject_map foreign key already correct";
+                }
+            }
+        } else {
+            $success[] = "✓ book_subject_map foreign key already correct";
+        }
+    }
+    
+    // 9. Fix book_category_map foreign keys (if table exists)
+    $book_category_map_exists = $conn->query("SHOW TABLES LIKE 'book_category_map'");
+    if($book_category_map_exists && $book_category_map_exists->num_rows > 0){
+        // Check if wrong foreign key exists
+        $check_fk = $conn->query("SELECT * FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'book_category_map' AND CONSTRAINT_NAME = 'book_category_map_ibfk_1'");
+        if($check_fk && $check_fk->num_rows > 0){
+            // Check if it points to wrong table
+            $fk_info = $conn->query("SELECT REFERENCED_TABLE_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'book_category_map' AND CONSTRAINT_NAME = 'book_category_map_ibfk_1'");
+            if($fk_info && $fk_info->num_rows > 0){
+                $fk_row = $fk_info->fetch_assoc();
+                if($fk_row['REFERENCED_TABLE_NAME'] == 'books_main'){
+                    // Drop incorrect foreign key
+                    $conn->query("ALTER TABLE book_category_map DROP FOREIGN KEY book_category_map_ibfk_1");
+                    // Add correct foreign key
+                    $conn->query("ALTER TABLE book_category_map ADD CONSTRAINT book_category_map_ibfk_1 FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE");
+                    $success[] = "✓ Fixed book_category_map foreign key to point to books table";
+                } else {
+                    $success[] = "✓ book_category_map foreign key already correct";
+                }
+            }
+        } else {
+            $success[] = "✓ book_category_map foreign key already correct";
+        }
+    }
+    
     // Re-enable foreign key checks
     $conn->query("SET FOREIGN_KEY_CHECKS=1");
     
@@ -230,7 +280,8 @@ include 'includes/header.php';
           • <strong>calibre_books_archive.created_at</strong> column - For tracking archive timestamps<br>
           • <strong>books.subject</strong> column - For storing book subject field<br>
           • <strong>Performance indexes</strong> on books.title and books.author - For faster catalog loading<br>
-          • <strong>archived_students.middlename</strong> column - For storing middle names of archived students
+          • <strong>archived_students.middlename</strong> column - For storing middle names of archived students<br>
+          • <strong>Foreign key fixes</strong> for book_category_map and book_subject_map tables
         </p>
       </div>
 
