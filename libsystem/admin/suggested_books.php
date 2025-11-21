@@ -1,9 +1,8 @@
 <?php 
 include 'includes/session.php';
 include 'includes/conn.php';
-include 'includes/header.php';
 
-// Handle Export to Word
+// Handle Export to Word (MUST BE BEFORE ANY HTML OUTPUT)
 if(isset($_POST['export_word'])){
     $month_filter = '';
     if(isset($_POST['month']) && $_POST['month'] != ''){
@@ -71,6 +70,9 @@ if(isset($_POST['export_word'])){
     echo '</table></body></html>';
     exit();
 }
+
+// Include header after export check
+include 'includes/header.php';
 ?>
 
 <body class="hold-transition skin-green sidebar-mini">
