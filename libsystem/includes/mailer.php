@@ -2,7 +2,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 
 function sendContactMail($name, $email, $message) {
