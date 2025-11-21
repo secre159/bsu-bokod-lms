@@ -35,7 +35,7 @@ if(isset($_POST['approve'])){
             INSERT INTO books (isbn, call_no, title, author, publisher, publish_date, subject, location, section, type, copy_number, num_copies, date_created, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        $stmt->bind_param("ssssssssssissi", $isbn, $call_no, $title, $author, $publisher, $publish_date, $subject, $location, $section, $type, $copy_number, $num_copies, $date_created, $status);
+        $stmt->bind_param("ssssssssssiisi", $isbn, $call_no, $title, $author, $publisher, $publish_date, $subject, $location, $section, $type, $copy_number, $num_copies, $date_created, $status);
 
         if($stmt->execute()){
             $stmt->close();

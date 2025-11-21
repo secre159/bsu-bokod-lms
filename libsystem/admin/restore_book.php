@@ -37,7 +37,7 @@ if (isset($_POST['id'])) {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->bind_param(
-            "ssssssssssissi",
+            "ssssssssssiisi",
             $isbn, $call_no, $title, $author, $publisher, $publish_date, $subject, $location, $section, $type, $copy_number, $num_copies, $date_created, $status
         );
         $stmt->execute();
