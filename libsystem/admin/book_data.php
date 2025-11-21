@@ -1,5 +1,13 @@
 <?php
-include 'includes/session.php';
+session_start();
+
+// Check if admin is logged in
+if(!isset($_SESSION['admin'])){
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
+}
+
 include 'includes/conn.php';
 
 // Get DataTables parameters
