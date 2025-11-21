@@ -2,7 +2,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
 
 function sendContactMail($name, $email, $message) {
@@ -17,7 +17,7 @@ function sendContactMail($name, $email, $message) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        $mail->setFrom($email, $name);
+        $mail->setFrom('marijoysapditbsu@gmail.com', 'BSU Library');
         $mail->addAddress('marijoysapditbsu@gmail.com', 'BSU Library System');
 
         $mail->isHTML(true);

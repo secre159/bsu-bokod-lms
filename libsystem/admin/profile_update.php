@@ -23,8 +23,8 @@ if(isset($_POST['save'])){
     $lastname = $_POST['lastname'];
     $photo = $_FILES['photo']['name'];
 
-    // Check current password (plain text)
-    if(trim($curr_password) === trim($user['password'])){
+    // Check current password (supports both hashed and plain text)
+    if(password_verify(trim($curr_password), trim($user['password'])) || trim($curr_password) === trim($user['password'])){
 
         // Handle photo upload
         if(!empty($photo)){
