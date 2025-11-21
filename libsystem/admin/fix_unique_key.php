@@ -22,8 +22,30 @@ if($add) {
     echo "<p style='color: red;'>❌ Error: " . $conn->error . "</p>";
 }
 
-// Test insert
-echo "<p>Step 3: Testing insert...</p>";
+// Check foreign keys
+echo "<p>Step 3: Checking foreign key constraints...</p>";
+$fks = $conn->query("SELECT * FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_NAME='book_subject_map' AND TABLE_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='FOREIGN KEY'");
+if($fks && $fks->num_rows > 0) {
+    echo "<p>Foreign keys found:</p><ul>";
+    while($fk = $fks->fetch_assoc()) {
+        echo "<li>{$fk['CONSTRAINT_NAME']}</li>";
+    }
+    echo "</ul>";
+} else {
+    echo "<p>No foreign keys found</p>";
+}
+
+// Test without IGNORE to see real error
+echo "<p>Step 4: Testing insert WITHOUT IGNORE to see actual error...</p>";
+$test_no_ignore = $conn->query("INSERT INTO book_subject_map (book_id, subject_id) VALUES (1, 19)");
+if($test_no_ignore) {
+    echo "<p style='color: green;'>✅ Insert successful! Affected rows: " . $conn->affected_rows . "</p>";
+} else {
+    echo "<p style='color: red;'>❌ Error: " . $conn->error . "</p>";
+}
+
+// Test insert with IGNORE
+echo "<p>Step 5: Testing insert with IGNORE...</p>";
 $test = $conn->query("INSERT IGNORE INTO book_subject_map (book_id, subject_id) VALUES (1, 19)");
 if($test) {
     echo "<p style='color: green;'>✅ Insert successful! Affected rows: " . $conn->affected_rows . "</p>";
