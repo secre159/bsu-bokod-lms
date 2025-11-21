@@ -135,6 +135,24 @@ if(isset($_POST['apply_fixes'])){
         }
     }
     
+    // 7. Add middlename column to archived_students table (if table exists)
+    $archived_students_exists = $conn->query("SHOW TABLES LIKE 'archived_students'");
+    if($archived_students_exists && $archived_students_exists->num_rows > 0){
+        $check_column = $conn->query("SHOW COLUMNS FROM `archived_students` LIKE 'middlename'");
+        if($check_column->num_rows == 0){
+            $sql = "ALTER TABLE `archived_students` ADD COLUMN `middlename` varchar(50) DEFAULT NULL AFTER `firstname`";
+            if($conn->query($sql)){
+                $success[] = "✓ Added 'middlename' column to archived_students table";
+            } else {
+                $errors[] = "✗ archived_students.middlename column: " . $conn->error;
+            }
+        } else {
+            $success[] = "✓ archived_students.middlename column already exists";
+        }
+    } else {
+        $errors[] = "✗ archived_students table does not exist - restore database first";
+    }
+    
     // Re-enable foreign key checks
     $conn->query("SET FOREIGN_KEY_CHECKS=1");
     
@@ -207,7 +225,8 @@ include 'includes/header.php';
           • <strong>archived_subject</strong> table - For archived subjects<br>
           • <strong>calibre_books_archive.created_at</strong> column - For tracking archive timestamps<br>
           • <strong>books.subject</strong> column - For storing book subject field<br>
-          • <strong>Performance indexes</strong> on books.title and books.author - For faster catalog loading
+          • <strong>Performance indexes</strong> on books.title and books.author - For faster catalog loading<br>
+          • <strong>archived_students.middlename</strong> column - For storing middle names of archived students
         </p>
       </div>
 
