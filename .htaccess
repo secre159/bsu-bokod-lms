@@ -8,16 +8,8 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # Set default directory index
 DirectoryIndex index.php index.html
 
-# Redirect root to libsystem
-RewriteCond %{REQUEST_URI} ^/$
-RewriteRule ^(.*)$ /libsystem/ [L,R=301]
-
-# Handle /admin/* requests - redirect to /libsystem/admin/*
-RewriteCond %{REQUEST_URI} ^/admin/
-RewriteRule ^admin/(.*)$ /libsystem/admin/$1 [L,R=301]
-
 # Custom 404 error page - redirect to home
-ErrorDocument 404 /libsystem/index.php
+ErrorDocument 404 /index.php
 
 # Prevent directory listing
 Options -Indexes
