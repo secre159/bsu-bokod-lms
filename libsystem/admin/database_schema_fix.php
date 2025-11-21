@@ -300,9 +300,37 @@ include 'includes/header.php';
                         'name' => 'books.subject column',
                         'exists' => $check && $check->num_rows > 0
                     );
+                    
+                    // Check performance indexes
+                    $check_idx_title = $conn->query("SHOW INDEX FROM `books` WHERE Key_name = 'idx_title'");
+                    $status[] = array(
+                        'name' => 'books.title index',
+                        'exists' => $check_idx_title && $check_idx_title->num_rows > 0
+                    );
+                    
+                    $check_idx_author = $conn->query("SHOW INDEX FROM `books` WHERE Key_name = 'idx_author'");
+                    $status[] = array(
+                        'name' => 'books.author index',
+                        'exists' => $check_idx_author && $check_idx_author->num_rows > 0
+                    );
                 } else {
                     $status[] = array(
                         'name' => 'books table',
+                        'exists' => false
+                    );
+                }
+                
+                // Check archived_students.middlename column (only if table exists)
+                $archived_students_exists = $conn->query("SHOW TABLES LIKE 'archived_students'");
+                if($archived_students_exists && $archived_students_exists->num_rows > 0){
+                    $check = $conn->query("SHOW COLUMNS FROM `archived_students` LIKE 'middlename'");
+                    $status[] = array(
+                        'name' => 'archived_students.middlename column',
+                        'exists' => $check && $check->num_rows > 0
+                    );
+                } else {
+                    $status[] = array(
+                        'name' => 'archived_students table',
                         'exists' => false
                     );
                 }
