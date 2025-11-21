@@ -8,7 +8,8 @@ $where = '';
 if(isset($_GET['category'])){
   $catid = intval($_GET['category']);
   if($catid > 0){
-    $where .= " AND m.category_id = $catid";
+    // Filter by category using book_category_map table
+    $where .= " AND EXISTS (SELECT 1 FROM book_category_map WHERE book_category_map.book_id = books.id AND book_category_map.category_id = $catid)";
   }
 }
 
