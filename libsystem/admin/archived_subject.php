@@ -34,9 +34,8 @@ include 'includes/conn.php';
           <table class="table table-bordered table-striped">
             <thead style="background-color: #006400; color: #FFD700; font-weight: bold;">
               <th>#</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Publisher</th>
+              <th>Subject Name</th>
+              <th>Date Archived</th>
               <th>Tools</th>
             </thead>
             <tbody>
@@ -49,9 +48,8 @@ include 'includes/conn.php';
                     echo "
                       <tr>
                         <td>".$i++."</td>
-                        <td>".htmlspecialchars($row['subject_title'] ?? '')."</td>
-                        <td>".htmlspecialchars($row['author'] ?? '')."</td>
-                        <td>".htmlspecialchars($row['publisher'] ?? '')."</td>
+                        <td>".htmlspecialchars($row['name'] ?? '')."</td>
+                        <td>".htmlspecialchars($row['date_archived'] ?? '')."</td>
                         <td>
                           <!-- Restore Button -->
                           <form method='POST' action='subject_restore.php' style='display:inline-block; margin-right:5px;'>
@@ -73,7 +71,7 @@ include 'includes/conn.php';
                     ";
                   }
                 } else {
-                  echo "<tr><td colspan='5' class='text-center'>No archived subjects found</td></tr>";
+                  echo "<tr><td colspan='4' class='text-center'>No archived subjects found</td></tr>";
                 }
               ?>
             </tbody>
