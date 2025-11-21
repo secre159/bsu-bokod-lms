@@ -82,10 +82,15 @@
                 <small style="opacity: 0.9;">Member since <?php echo date('M. Y', strtotime($user['created_on'])); ?></small>
               </p>
             </li>
-            <li class="user-footer" style="background: #f8f9fa; text-align: center;">
-              <a href="logout.php" class="btn btn-default btn-flat" style="background: linear-gradient(135deg, #006400, #228B22); color: white; border: none; font-weight: bold; width: 100%;">
-                <i class="fa fa-sign-out"></i> Sign out
-              </a>
+            <li class="user-footer" style="background: #f8f9fa; padding: 10px;">
+              <div style="display: flex; gap: 5px;">
+                <a href="#profile" data-toggle="modal" class="btn btn-default btn-flat" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #006400; border: none; font-weight: bold; flex: 1;">
+                  <i class="fa fa-cog"></i> Profile
+                </a>
+                <a href="logout.php" class="btn btn-default btn-flat" style="background: linear-gradient(135deg, #006400, #228B22); color: white; border: none; font-weight: bold; flex: 1;">
+                  <i class="fa fa-sign-out"></i> Sign out
+                </a>
+              </div>
             </li>
           </ul>
         </li>
