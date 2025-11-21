@@ -20,6 +20,35 @@ if($check_table->num_rows == 0) {
 } else {
     echo "<p style='color: green;'>✅ book_subject_map table exists</p>";
     
+    // Show table structure
+    echo "<h3>Table Structure:</h3>";
+    $structure = $conn->query("DESCRIBE book_subject_map");
+    if($structure) {
+        echo "<table border='1' cellpadding='5'>";
+        echo "<tr><th>Field</th><th>Type</th><th>Null</th><th>Key</th><th>Default</th><th>Extra</th></tr>";
+        while($col = $structure->fetch_assoc()) {
+            echo "<tr>";
+            echo "<td>{$col['Field']}</td>";
+            echo "<td>{$col['Type']}</td>";
+            echo "<td>{$col['Null']}</td>";
+            echo "<td>{$col['Key']}</td>";
+            echo "<td>".(($col['Default'] ?? 'NULL'))."</td>";
+            echo "<td>{$col['Extra']}</td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+    }
+    
+    // Try a manual insert to test
+    echo "<h3>Manual Insert Test:</h3>";
+    echo "<p>Trying to insert book_id=1, subject_id=19...</p>";
+    $test_insert = $conn->query("INSERT IGNORE INTO book_subject_map (book_id, subject_id) VALUES (1, 19)");
+    if($test_insert) {
+        echo "<p style='color: green;'>✅ Manual insert successful! Affected rows: ".$conn->affected_rows."</p>";
+    } else {
+        echo "<p style='color: red;'>❌ Manual insert failed: ".$conn->error."</p>";
+    }
+    
     // Show all assignments
     $sql = "SELECT bsm.*, b.title AS book_title, s.name AS subject_name 
             FROM book_subject_map bsm
