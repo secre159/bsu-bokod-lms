@@ -81,11 +81,13 @@
 
             <!-- Dropdown menu -->
             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-success" aria-labelledby="userDropdown">
+              <?php if(!isset($_SESSION['admin'])): ?>
               <li>
                 <a class="dropdown-item fw-semibold text-success" href="settings.php">
                   <i class="fa fa-cog me-2"></i>Profile Settings
                 </a>
               </li>
+              <?php endif; ?>
               
               <?php if(isset($_SESSION['admin'])): ?>
                 <li>
