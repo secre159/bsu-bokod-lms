@@ -48,6 +48,7 @@ SELECT
   '' AS call_no,
   'Available for download at the library via Calibre' AS location,
   DATE_FORMAT(cb.published_date, '%Y-%m-%d') AS publish_date,
+  '' AS book_subject,
   NULL AS categories,
   cb.tags AS subjects,
   'Digital Library' AS type,
