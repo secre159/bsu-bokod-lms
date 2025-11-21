@@ -108,7 +108,7 @@
           
         <?php else: ?>
           <li class="nav-item">
-            <a href="#AccessID" class="btn btn-sm btn-success text-white fw-bold px-3">
+            <a href="index.php#AccessID" class="btn btn-sm btn-success text-white fw-bold px-3">
               <i class="fa fa-sign-in-alt me-1"></i>Login
             </a>
           </li>

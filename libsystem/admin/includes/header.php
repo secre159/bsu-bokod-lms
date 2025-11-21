@@ -91,8 +91,7 @@
       /* Fixed sidebar styling */
       .main-sidebar {
         position: fixed !important;
-        top: 50px;
-        height: calc(100vh - 50px) !important;
+        height: 100vh !important;
         overflow-y: auto !important;
         overflow-x: hidden;
       }
