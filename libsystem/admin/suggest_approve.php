@@ -21,6 +21,7 @@ if(isset($_POST['approve'])){
 
         // Insert into physical books table with required columns
         $location = 'Library';
+        $section = 'General';
         $call_no = '';
         $publisher = '';
         $publish_date = ''; // unknown from suggestion
@@ -29,10 +30,10 @@ if(isset($_POST['approve'])){
         $status = 0;
 
         $stmt = $conn->prepare("
-            INSERT INTO books (isbn, call_no, title, author, publisher, publish_date, subject, location, copy_number, num_copies, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO books (isbn, call_no, title, author, publisher, publish_date, subject, location, section, copy_number, num_copies, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        $stmt->bind_param("ssssssssiii", $isbn, $call_no, $title, $author, $publisher, $publish_date, $subject, $location, $copy_number, $num_copies, $status);
+        $stmt->bind_param("ssssssssssii", $isbn, $call_no, $title, $author, $publisher, $publish_date, $subject, $location, $section, $copy_number, $num_copies, $status);
 
         if($stmt->execute()){
             $stmt->close();

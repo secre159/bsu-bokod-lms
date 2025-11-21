@@ -33,11 +33,12 @@ if (isset($_POST['add'])) {
 
     // ===== Prepare main insert =====
     $location = 'Library'; // Default location
+    $section = 'General'; // Default section
     $stmt = $conn->prepare("
-        INSERT INTO books (isbn, call_no, title, author, publisher, publish_date, subject, location, copy_number, num_copies, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+        INSERT INTO books (isbn, call_no, title, author, publisher, publish_date, subject, location, section, copy_number, num_copies, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
     ");
-    $stmt->bind_param("ssssssssii", $isbn, $call_no, $title, $author, $publisher, $pub_date, $subject, $location, $copy_number, $num_copies);
+    $stmt->bind_param("sssssssssii", $isbn, $call_no, $title, $author, $publisher, $pub_date, $subject, $location, $section, $copy_number, $num_copies);
 
     $cat_stmt = $conn->prepare("INSERT INTO book_category_map (book_id, category_id) VALUES (?, ?)");
     $subj_stmt = $conn->prepare("INSERT INTO book_subject_map (book_id, subject_id) VALUES (?, ?)");
