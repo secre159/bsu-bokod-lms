@@ -49,9 +49,9 @@ include 'includes/conn.php';
                     echo "
                       <tr>
                         <td>".$i++."</td>
-                        <td>".htmlspecialchars($row['subject_title'])."</td>
-                        <td>".htmlspecialchars($row['author'])."</td>
-                        <td>".htmlspecialchars($row['publisher'])."</td>
+                        <td>".htmlspecialchars($row['subject_title'] ?? '')."</td>
+                        <td>".htmlspecialchars($row['author'] ?? '')."</td>
+                        <td>".htmlspecialchars($row['publisher'] ?? '')."</td>
                         <td>
                           <!-- Restore Button -->
                           <form method='POST' action='subject_restore.php' style='display:inline-block; margin-right:5px;'>
