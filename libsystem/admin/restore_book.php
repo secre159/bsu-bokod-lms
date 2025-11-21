@@ -15,28 +15,27 @@ if (isset($_POST['id'])) {
     $stmt->close();
 
     if ($book) {
-        // 2️⃣ Restore the book record to 'books'
+        // 2️⃣ Restore the book record to 'books' (align columns with current schema)
+        $isbn = $book['isbn'] ?? '';
+        $call_no = $book['call_no'] ?? '';
+        $location = $book['location'] ?? 'Library';
+        $title = $book['title'] ?? '';
+        $subject = $book['subject'] ?? '';
+        $author = $book['author'] ?? '';
+        $publisher = $book['publisher'] ?? '';
+        $publish_date = $book['publish_date'] ?? '';
+        $copy_number = isset($book['copy_number']) ? intval($book['copy_number']) : 1;
+        $num_copies = isset($book['num_copies']) ? intval($book['num_copies']) : 1;
+        $status = 0;
+
         $stmt = $conn->prepare("
             INSERT INTO books 
-            (isbn, call_no, location, title, subject, author, publisher, publish_date, copy_number, date_added, status, pub_date, category_id, subject_id) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (isbn, call_no, title, author, publisher, publish_date, subject, location, copy_number, num_copies, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->bind_param(
-            "sssssssssisiis",
-            $book['isbn'],
-            $book['call_no'],
-            $book['location'],
-            $book['title'],
-            $book['subject'],
-            $book['author'],
-            $book['publisher'],
-            $book['publish_date'],
-            $book['copy_number'],
-            $book['date_added'],
-            $book['status'],
-            $book['pub_date'],
-            $book['category_id'],
-            $book['subject_id']
+            "ssssssssiii",
+            $isbn, $call_no, $title, $author, $publisher, $publish_date, $subject, $location, $copy_number, $num_copies, $status
         );
         $stmt->execute();
         $restored_book_id = $conn->insert_id; // newly inserted book ID

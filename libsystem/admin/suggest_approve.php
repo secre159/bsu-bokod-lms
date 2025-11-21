@@ -19,11 +19,23 @@ if(isset($_POST['approve'])){
         $subject = mysqli_real_escape_string($conn, $row['subject']);
         $description = mysqli_real_escape_string($conn, $row['description']);
 
-        // Insert into physical books table
-        $insert = "INSERT INTO books (title, author, isbn, subject, description, date_added, status) 
-                   VALUES ('$title', '$author', '$isbn', '$subject', '$description', NOW(), 'Available')";
+        // Insert into physical books table with required columns
+        $location = 'Library';
+        $call_no = '';
+        $publisher = '';
+        $publish_date = ''; // unknown from suggestion
+        $copy_number = 1;
+        $num_copies = 1;
+        $status = 0;
 
-        if($conn->query($insert)){
+        $stmt = $conn->prepare("
+            INSERT INTO books (isbn, call_no, title, author, publisher, publish_date, subject, location, copy_number, num_copies, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->bind_param("ssssssssiii", $isbn, $call_no, $title, $author, $publisher, $publish_date, $subject, $location, $copy_number, $num_copies, $status);
+
+        if($stmt->execute()){
+            $stmt->close();
             // Instead of deleting, update status to 'Approved'
             $conn->query("UPDATE suggested_books SET status='Approved' WHERE id = '$id'");
             $_SESSION['success'] = "Suggested book has been approved and added to the library!";
