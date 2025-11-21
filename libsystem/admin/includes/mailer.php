@@ -17,7 +17,7 @@ function sendContactMail($name, $email, $message) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        $mail->setFrom($email, $name);
+        $mail->setFrom('marijoysapditbsu@gmail.com', 'BSU Library');
         $mail->addAddress('marijoysapditbsu@gmail.com', 'BSU-Bokod Library System');
 
         $mail->isHTML(true);
@@ -56,7 +56,7 @@ function sendMailTemplate($to, $subject, $body)
         $mail->Port       = 587;
 
         // Recipients
-        $mail->setFrom('yourgmail@gmail.com', 'BSU Library');
+        $mail->setFrom('marijoysapditbsu@gmail.com', 'BSU Library');
         $mail->addAddress($to);
 
         // Content
