@@ -17,7 +17,8 @@ $subject_where = '';
 if(isset($_GET['subject'])){
   $subjid = intval($_GET['subject']);
   if($subjid > 0){
-    $subject_where .= " AND books.subject_id = $subjid";
+    // Filter by course subject using book_subject_map table
+    $subject_where .= " AND EXISTS (SELECT 1 FROM book_subject_map WHERE book_subject_map.book_id = books.id AND book_subject_map.subject_id = $subjid)";
   }
 }
 
