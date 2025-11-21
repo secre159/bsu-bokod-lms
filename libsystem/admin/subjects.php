@@ -442,10 +442,8 @@ $(document).ready(function() {
           if (successCount === selectedBooks.length) {
             alert('Books successfully assigned.');
             $('#assignBooksModal').modal('hide');
-
-            // Auto-refresh the subject table
-            const block = $(`.subject-block[data-subject='${subjectId}']`);
-            block.find('table tbody').load(location.href + ` .subject-block[data-subject='${subjectId}'] table tbody>*`, '');
+            // Full page reload to show updated assignments
+            location.reload();
           }
         },
         error: function() {
@@ -506,10 +504,8 @@ $(document).ready(function() {
       success: function(response) {
         $('#confirmRemoveModal').modal('hide');
         alert(response);
-
-        // Auto-refresh only the affected subject table
-        const block = $(`.subject-block[data-subject='${subjectId}']`);
-        block.find('table tbody').load(location.href + ` .subject-block[data-subject='${subjectId}'] table tbody>*`, '');
+        // Full page reload to show updated assignments
+        location.reload();
       },
       error: function() {
         alert('Error: Could not remove the selected books.');
