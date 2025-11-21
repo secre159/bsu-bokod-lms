@@ -16,6 +16,13 @@ function sendContactMail($name, $email, $message) {
         $mail->Password   = 'ihzfufsmsyobxxaf';     // your 16-character app password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
 
         $mail->setFrom('marijoysapditbsu@gmail.com', 'BSU Library');
         $mail->addAddress('marijoysapditbsu@gmail.com', 'BSU Library System');
