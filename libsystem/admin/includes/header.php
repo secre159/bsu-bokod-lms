@@ -112,5 +112,25 @@
       .main-sidebar::-webkit-scrollbar-thumb:hover {
         background: #228B22;
       }
+
+      /* Fixed navbar styling */
+      .main-header {
+        position: fixed !important;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+      }
+
+      /* Adjust body to account for fixed navbar */
+      .content-wrapper {
+        margin-top: 50px;
+      }
+
+      /* Adjust sidebar top position */
+      .main-sidebar {
+        top: 50px;
+        height: calc(100vh - 50px);
+      }
   	</style>
 </head>
