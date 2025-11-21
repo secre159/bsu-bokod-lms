@@ -14,8 +14,8 @@ function sendContactMail($name, $email, $message) {
         $mail->SMTPAuth   = true;
         $mail->Username   = 'marijoysapditbsu@gmail.com'; // your Gmail
         $mail->Password   = 'ihzfufsmsyobxxaf';     // your 16-character app password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port       = 465;
         $mail->SMTPOptions = array(
             'ssl' => array(
                 'verify_peer' => false,
@@ -59,8 +59,8 @@ function sendMailTemplate($to, $subject, $body)
         $mail->SMTPAuth   = true;
         $mail->Username   = 'marijoysapditbsu@gmail.com'; // your Gmail
         $mail->Password   = 'ihzfufsmsyobxxaf';     // your 16-character app password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port       = 465;
         $mail->SMTPOptions = array(
             'ssl' => array(
                 'verify_peer' => false,
