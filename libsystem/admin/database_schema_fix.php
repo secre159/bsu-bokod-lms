@@ -106,6 +106,35 @@ if(isset($_POST['apply_fixes'])){
         $errors[] = "✗ books table does not exist - restore database first";
     }
     
+    // 6. Add performance indexes to books table
+    if($books_exists && $books_exists->num_rows > 0){
+        // Check if index exists on title
+        $check_index = $conn->query("SHOW INDEX FROM `books` WHERE Key_name = 'idx_title'");
+        if($check_index->num_rows == 0){
+            $sql = "ALTER TABLE `books` ADD INDEX `idx_title` (`title`)";
+            if($conn->query($sql)){
+                $success[] = "✓ Added performance index on books.title";
+            } else {
+                $errors[] = "✗ books.title index: " . $conn->error;
+            }
+        } else {
+            $success[] = "✓ books.title index already exists";
+        }
+        
+        // Check if index exists on author
+        $check_index = $conn->query("SHOW INDEX FROM `books` WHERE Key_name = 'idx_author'");
+        if($check_index->num_rows == 0){
+            $sql = "ALTER TABLE `books` ADD INDEX `idx_author` (`author`)";
+            if($conn->query($sql)){
+                $success[] = "✓ Added performance index on books.author";
+            } else {
+                $errors[] = "✗ books.author index: " . $conn->error;
+            }
+        } else {
+            $success[] = "✓ books.author index already exists";
+        }
+    }
+    
     // Re-enable foreign key checks
     $conn->query("SET FOREIGN_KEY_CHECKS=1");
     
@@ -177,7 +206,8 @@ include 'includes/header.php';
           • <strong>faculty.archived</strong> column - For archiving faculty records<br>
           • <strong>archived_subject</strong> table - For archived subjects<br>
           • <strong>calibre_books_archive.created_at</strong> column - For tracking archive timestamps<br>
-          • <strong>books.subject</strong> column - For storing book subject field
+          • <strong>books.subject</strong> column - For storing book subject field<br>
+          • <strong>Performance indexes</strong> on books.title and books.author - For faster catalog loading
         </p>
       </div>
 

@@ -440,6 +440,7 @@ body {
                         <td class='text-center'>—</td>
                         <td><small class='text-muted'>".htmlspecialchars($location ?? '')."</small></td>
                         <td>-</td>
+                        <td>-</td>
                         <td><div class='badge-container'>".render_badges_with_more($topics,'bg-info')."</div></td>
                         <td class='text-center'>$status</td>
                         <td class='text-center'>$actions</td>
@@ -481,13 +482,20 @@ $(document).ready(function () {
     ordering: true,
     info: true,
     responsive: true,
+    deferRender: true,
+    processing: true,
     language: {
       search: "<b>Search:</b>",
       info: "Showing _START_ to _END_ of _TOTAL_ items",
-      lengthMenu: "Show _MENU_ items"
+      lengthMenu: "Show _MENU_ items",
+      processing: "Loading..."
     },
-    pageLength: 10,
+    pageLength: 25,
     lengthMenu: [10, 25, 50, 100],
+    order: [[1, 'asc']],
+    columnDefs: [
+      { orderable: false, targets: [9] }
+    ],
     initComplete: function() {
       $('#totalItems').text(this.api().data().length);
       updateSearchVisibility(); // Initialize search visibility
