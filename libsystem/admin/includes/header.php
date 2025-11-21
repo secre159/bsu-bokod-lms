@@ -79,15 +79,34 @@
         border-radius: 5px;
       }
 
+      /* Fixed navbar styling */
+      .main-header {
+        position: fixed !important;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+      }
+
       /* Fixed sidebar styling */
       .main-sidebar {
         position: fixed !important;
-        height: 100vh;
-        overflow-y: auto;
+        top: 50px;
+        height: calc(100vh - 50px) !important;
+        overflow-y: auto !important;
         overflow-x: hidden;
       }
 
-      /* Adjust content wrapper to account for fixed sidebar */
+      /* Ensure sidebar content is scrollable */
+      .main-sidebar .sidebar {
+        padding-bottom: 50px;
+      }
+
+      /* Adjust content wrapper to account for fixed sidebar and navbar */
+      .content-wrapper {
+        margin-top: 50px;
+      }
+
       @media (min-width: 768px) {
         .content-wrapper,
         .main-footer {
@@ -111,26 +130,6 @@
 
       .main-sidebar::-webkit-scrollbar-thumb:hover {
         background: #228B22;
-      }
-
-      /* Fixed navbar styling */
-      .main-header {
-        position: fixed !important;
-        top: 0;
-        right: 0;
-        left: 0;
-        z-index: 1030;
-      }
-
-      /* Adjust body to account for fixed navbar */
-      .content-wrapper {
-        margin-top: 50px;
-      }
-
-      /* Adjust sidebar top position */
-      .main-sidebar {
-        top: 50px;
-        height: calc(100vh - 50px);
       }
   	</style>
 </head>
