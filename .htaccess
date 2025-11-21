@@ -1,0 +1,36 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Redirect to HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Set default directory index
+DirectoryIndex index.php index.html
+
+# Redirect root to libsystem
+RewriteCond %{REQUEST_URI} ^/$
+RewriteRule ^(.*)$ /libsystem/ [L,R=301]
+
+# Handle /admin/* requests - redirect to /libsystem/admin/*
+RewriteCond %{REQUEST_URI} ^/admin/
+RewriteRule ^admin/(.*)$ /libsystem/admin/$1 [L,R=301]
+
+# Custom 404 error page - redirect to home
+ErrorDocument 404 /libsystem/index.php
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql|md)$">
+    Require all denied
+</FilesMatch>
+
+# PHP settings
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 50M
+    php_value post_max_size 50M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
