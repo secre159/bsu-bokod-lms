@@ -432,22 +432,26 @@ $(document).ready(function() {
 
     let successCount = 0;
 
+    console.log('Assigning books:', selectedBooks, 'to subject:', subjectId);
+    
     selectedBooks.forEach(bookId => {
       $.ajax({
         url: 'assign_book.php',
         type: 'POST',
         data: { book_id: bookId, subject_id: subjectId },
         success: function(response) {
+          console.log('Response for book', bookId, ':', response);
           successCount++;
           if (successCount === selectedBooks.length) {
-            alert('Books successfully assigned.');
+            alert('Books successfully assigned. Response: ' + response);
             $('#assignBooksModal').modal('hide');
             // Full page reload to show updated assignments
             location.reload();
           }
         },
-        error: function() {
-          alert('Error assigning some books.');
+        error: function(xhr, status, error) {
+          console.error('Error assigning book', bookId, ':', error);
+          alert('Error assigning some books: ' + error);
         }
       });
     });
