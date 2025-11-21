@@ -83,8 +83,8 @@
             $_SESSION['error'] = "Faculty ID or Email already exists.";
           } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("INSERT INTO faculty (faculty_id, password, firstname, lastname, phone, email, department, created_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssssss", $faculty_id, $hashed_password, $firstname, $lastname, $phone, $email, $department, $created_on);
+            $stmt = $conn->prepare("INSERT INTO faculty (faculty_id, password, firstname, middlename, lastname, phone, email, department, created_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssssss", $faculty_id, $hashed_password, $firstname, $middlename, $lastname, $phone, $email, $department, $created_on);
 
             if($stmt->execute()){
               $_SESSION['success'] = "Faculty member added successfully!";
@@ -126,7 +126,7 @@
                     <i class="fa fa-users"></i> Total Employee: 
                     <strong>
                       <?php 
-                        $count_sql = "SELECT COUNT(*) as total FROM faculty";
+                        $count_sql = "SELECT COUNT(*) as total FROM faculty WHERE archived = 0";
                         $count_result = $conn->query($count_sql);
                         echo $count_result->fetch_assoc()['total'];
                       ?>
@@ -154,7 +154,7 @@
                 </thead>
                 <tbody>
                   <?php
-                    $sql = "SELECT * FROM faculty ORDER BY created_on DESC";
+                    $sql = "SELECT * FROM faculty WHERE archived = 0 ORDER BY created_on DESC";
                     $query = $conn->query($sql);
                     while($row = $query->fetch_assoc()){
                       echo "
