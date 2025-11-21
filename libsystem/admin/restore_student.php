@@ -17,14 +17,15 @@ if(isset($_POST['id'])) {
         // Insert into students table
         // Generate default password if not stored in archive
         $password = isset($student['password']) ? $student['password'] : password_hash($student['student_id'], PASSWORD_DEFAULT);
+        $created_on = isset($student['created_on']) ? $student['created_on'] : date('Y-m-d H:i:s');
         
         $insert = $conn->prepare("
             INSERT INTO students 
-            (student_id, firstname, middlename, lastname, email, phone, course_id, password) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (student_id, firstname, middlename, lastname, email, phone, course_id, password, created_on) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $insert->bind_param(
-            "ssssssis",
+            "sssssssss",
             $student['student_id'],
             $student['firstname'],
             $student['middlename'],
@@ -32,7 +33,8 @@ if(isset($_POST['id'])) {
             $student['email'],
             $student['phone'],
             $student['course_id'],
-            $password
+            $password,
+            $created_on
         );
         $insert->execute();
         $insert->close();
