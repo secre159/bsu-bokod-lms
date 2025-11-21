@@ -236,92 +236,9 @@ $available_books = $available_books_query->fetch_assoc()['available'];
                   <th style="border-right: 1px solid #228B22;">Status</th>
                   <th>Tools</th>
                 </thead>
-                  <tbody>
-                    <?php
-                    $today = date('Y-m-d');
-
-                    // Fetch books with their categories, subjects, and latest borrow info
-                    $sql = "
-                        SELECT 
-                            books.id AS bookid,
-                            books.isbn,
-                            books.call_no,
-                            books.title,
-                            books.author,
-                            books.publisher,
-                            books.publish_date,
-                            books.date_created,
-                            books.copy_number,
-                            books.num_copies,
-                            books.subject AS book_subject,
-                            GROUP_CONCAT(DISTINCT subject.name ORDER BY subject.name SEPARATOR ', ') AS subject_list,
-                            GROUP_CONCAT(DISTINCT category.name ORDER BY category.name SEPARATOR ', ') AS category_list,
-                            bt.status AS borrow_status,
-                            bt.due_date AS borrow_due_date
-                        FROM books
-                        LEFT JOIN book_category_map bcm ON books.id = bcm.book_id
-                        LEFT JOIN category ON bcm.category_id = category.id
-                        LEFT JOIN book_subject_map bsm ON books.id = bsm.book_id
-                        LEFT JOIN subject ON bsm.subject_id = subject.id
-                        LEFT JOIN (
-                            SELECT * 
-                            FROM borrow_transactions
-                            WHERE status = 'borrowed'
-                        ) bt ON books.id = bt.book_id
-                        WHERE 1=1
-                        $where
-                        $subject_where
-                        GROUP BY books.id
-                        ORDER BY books.id DESC
-                        ";
-
-
-                    $query = $conn->query($sql);
-
-                    while ($row = $query->fetch_assoc()) {
-
-                        // Determine book status
-                        if (!$row['borrow_status']) {
-                            $status = '<span class="label" style="background: linear-gradient(135deg, #32CD32 0%, #28a428 100%); color: white; padding: 5px 12px; border-radius: 15px; font-weight: 600;">Available</span>';
-                        } elseif ($row['borrow_status'] == 'borrowed' && $today > $row['borrow_due_date']) {
-                            $status = '<span class="label" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); color: white; padding: 5px 12px; border-radius: 15px; font-weight: 600;">Overdue</span>';
-                        } elseif ($row['borrow_status'] == 'borrowed') {
-                            $status = '<span class="label" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: white; padding: 5px 12px; border-radius: 15px; font-weight: 600;">Borrowed</span>';
-                        } else {
-                            $status = '<span class="label" style="background: linear-gradient(135deg, #32CD32 0%, #28a428 100%); color: white; padding: 5px 12px; border-radius: 15px; font-weight: 600;">Available</span>';
-                        }
-
-                        echo "
-                        <tr style='transition: all 0.3s ease;'>
-                            <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['category_list'] ?: 'Uncategorized')."</small></td>
-                            <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['book_subject'] ?: '-')."</small></td>
-                            <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['subject_list'] ?: 'Unassigned')."</small></td>
-                            <td style='border-right: 1px solid #f0f0f0; font-family: monospace;'><code>".htmlspecialchars($row['isbn'])."</code></td>
-                            <td style='border-right: 1px solid #f0f0f0;'>".htmlspecialchars($row['call_no'])."</td>
-                            <td style='border-right: 1px solid #f0f0f0; font-weight: 500; color: #006400;'>".htmlspecialchars($row['title'])."</td>
-                            <td style='border-right: 1px solid #f0f0f0;'>".htmlspecialchars($row['author'])."</td>
-                            <td style='border-right: 1px solid #f0f0f0;'>".htmlspecialchars($row['publisher'])."</td>
-                            <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['publish_date'])."</small></td>
-                            <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars(date('F d, Y', strtotime($row['date_created'])))."</small></td>
-                            <td style='border-right: 1px solid #f0f0f0; text-align: center; font-weight: 600;'>".htmlspecialchars($row['copy_number'])."</td>
-                            <td style='border-right: 1px solid #f0f0f0; text-align: center; font-weight: 600;'>".htmlspecialchars($row['num_copies'])."</td>
-                            <td style='border-right: 1px solid #f0f0f0; text-align: center;'>".$status."</td>
-                            <td class='text-center'>
-                                <div class='btn-group btn-group-sm' role='group'>
-                                    <button class='btn btn-warning edit' data-id='".$row['bookid']."' title='Edit' style='border-radius: 5px; margin-right: 5px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); border: none; color: #006400;'>
-                                        <i class='fa fa-edit'>Edit</i>
-                                    </button>
-                                    <button class='btn btn-danger delete' data-id='".$row['bookid']."' title='Delete' style='border-radius: 5px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); border: none;'>
-                                        <i class='fa fa-trash'>Delete</i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        ";
-                    }
-                    ?>
-                  </tbody>
-
+                <tbody>
+                  <!-- Data loaded via Ajax -->
+                </tbody>
               </table>
             </div>
 
@@ -329,7 +246,6 @@ $available_books = $available_books_query->fetch_assoc()['available'];
             <div class="box-footer" style="background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%); padding: 15px; border-top: 1px solid #e0e0e0;">
               <div class="text-muted text-center" style="font-weight: 500;">
                 <i class="fa fa-info-circle" style="color: #006400;"></i>
-                Total Books: <strong><?php echo $query->num_rows; ?></strong> | 
                 Filtered by: 
                 <strong>
                   <?php 
@@ -352,31 +268,14 @@ $available_books = $available_books_query->fetch_assoc()['available'];
 <?php include 'includes/scripts.php'; ?>
 
 <script>
-$(function(){
-  // Category and Subject filters
-  $('#select_category').change(function(){
-    var value = $(this).val();
-    var subj = $('#select_subject').val();
-    if(value == 0 && subj == 0) {
-      window.location = 'book.php';
-    } else {
-      var url = 'book.php?';
-      if(value > 0) url += 'category=' + value;
-      if(subj > 0) url += (value > 0 ? '&' : '') + 'subject=' + subj;
-      window.location = url;
-    }
-  });
+// Store table reference globally
+var bookTable;
 
-  $('#select_subject').change(function(){
-    var value = $(this).val();
-    var cat = $('#select_category').val();
-    if(cat == 0 && value == 0) {
-      window.location = 'book.php';
-    } else {
-      var url = 'book.php?';
-      if(cat > 0) url += 'category=' + cat;
-      if(value > 0) url += (cat > 0 ? '&' : '') + 'subject=' + value;
-      window.location = url;
+$(function(){
+  // Category and Subject filters - reload table instead of page
+  $('#select_category, #select_subject').change(function(){
+    if(bookTable) {
+      bookTable.ajax.reload();
     }
   });
 
@@ -393,21 +292,6 @@ $(function(){
     var id = $(this).data('id');
     getRow(id);
   });
-
-
-  // Add hover effects to table rows (excluding header)
-  $('tbody tr').hover(
-    function() {
-      $(this).css('background-color', '#f8fff8');
-      $(this).css('transform', 'translateY(-2px)');
-      $(this).css('box-shadow', '0 2px 8px rgba(0,100,0,0.1)');
-    },
-    function() {
-      $(this).css('background-color', '');
-      $(this).css('transform', 'translateY(0)');
-      $(this).css('box-shadow', 'none');
-    }
-  );
 });
 
 function getRow(id){
@@ -454,33 +338,74 @@ function getRow(id){
 
 
 $(function () {
-  // Initialize DataTable with performance optimizations
-  var table = $('#example1').DataTable({
+  // Initialize DataTable with Ajax server-side processing
+  bookTable = $('#example1').DataTable({
     responsive: true,
-    "deferRender": true,
     "processing": true,
+    "serverSide": true,
+    "ajax": {
+      "url": "book_data.php",
+      "type": "POST",
+      "data": function(d) {
+        d.category = $('#select_category').val();
+        d.subject = $('#select_subject').val();
+      }
+    },
+    "columns": [
+      { "data": "category" },
+      { "data": "subject" },
+      { "data": "course_subject" },
+      { "data": "isbn" },
+      { "data": "call_no" },
+      { "data": "title" },
+      { "data": "author" },
+      { "data": "publisher" },
+      { "data": "publish_date" },
+      { "data": "date_created" },
+      { "data": "copy_number" },
+      { "data": "num_copies" },
+      { "data": "status" },
+      { "data": "tools", "orderable": false }
+    ],
     "pageLength": 25,
-    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+    "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
     "language": {
       "search": "🔍 Filter results:",
       "lengthMenu": "Show _MENU_ books per page",
       "info": "Showing _START_ to _END_ of _TOTAL_ books",
       "infoFiltered": "(filtered from _MAX_ total books)",
-      "processing": "Loading books...",
+      "processing": "<i class='fa fa-spinner fa-spin'></i> Loading books...",
       "paginate": {
         "previous": "← Previous",
         "next": "Next →"
       }
     },
-    "dom": 'lrtip' // Remove default search box since we have custom one
+    "dom": 'lrtip', // Remove default search box since we have custom one
+    "order": [[9, "desc"]] // Order by date_created descending
   });
 
   // Quick search functionality
   $('#quickSearch').on('keyup', function() {
-    table.search(this.value).draw();
+    bookTable.search(this.value).draw();
+  });
+
+  // Add hover effects after table draw
+  bookTable.on('draw', function() {
+    $('tbody tr').hover(
+      function() {
+        $(this).css('background-color', '#f8fff8');
+        $(this).css('transform', 'translateY(-2px)');
+        $(this).css('box-shadow', '0 2px 8px rgba(0,100,0,0.1)');
+      },
+      function() {
+        $(this).css('background-color', '');
+        $(this).css('transform', 'translateY(0)');
+        $(this).css('box-shadow', 'none');
+      }
+    );
   });
 });
-</script>
 
+function getRow(id){
 </body>
 </html>
