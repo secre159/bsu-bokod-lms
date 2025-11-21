@@ -20,6 +20,7 @@ if (isset($_POST['id'])) {
         $call_no = $book['call_no'] ?? '';
         $location = $book['location'] ?? 'Library';
         $section = $book['section'] ?? 'General';
+        $type = $book['type'] ?? 'Book';
         $title = $book['title'] ?? '';
         $subject = $book['subject'] ?? '';
         $author = $book['author'] ?? '';
@@ -27,16 +28,17 @@ if (isset($_POST['id'])) {
         $publish_date = $book['publish_date'] ?? '';
         $copy_number = isset($book['copy_number']) ? intval($book['copy_number']) : 1;
         $num_copies = isset($book['num_copies']) ? intval($book['num_copies']) : 1;
+        $date_created = $book['date_created'] ?? date('Y-m-d H:i:s');
         $status = 0;
 
         $stmt = $conn->prepare("
             INSERT INTO books 
-            (isbn, call_no, title, author, publisher, publish_date, subject, location, section, copy_number, num_copies, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (isbn, call_no, title, author, publisher, publish_date, subject, location, section, type, copy_number, num_copies, date_created, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->bind_param(
-            "ssssssssssii",
-            $isbn, $call_no, $title, $author, $publisher, $publish_date, $subject, $location, $section, $copy_number, $num_copies, $status
+            "ssssssssssissi",
+            $isbn, $call_no, $title, $author, $publisher, $publish_date, $subject, $location, $section, $type, $copy_number, $num_copies, $date_created, $status
         );
         $stmt->execute();
         $restored_book_id = $conn->insert_id; // newly inserted book ID
