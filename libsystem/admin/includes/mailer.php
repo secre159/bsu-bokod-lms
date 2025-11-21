@@ -1,8 +1,8 @@
 <?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-// ✅ Corrected path to autoload.php
-require __DIR__ . '/../../../vendor/autoload.php';
+// ✅ Corrected path to autoload.php (from libsystem/admin/includes to root)
+require __DIR__ . '/../../../../vendor/autoload.php';
 
 
 function sendContactMail($name, $email, $message) {
