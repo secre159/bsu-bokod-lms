@@ -57,6 +57,36 @@
             </div>
           </div>
 
+          <!-- Subject -->
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Subject</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" name="subject" placeholder="Enter subject (e.g., Mathematics, Science)">
+              <small class="text-muted">Optional: General subject area of the book</small>
+            </div>
+          </div>
+
+          <!-- Course Subject -->
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Course Subject</label>
+            <div class="col-sm-9 category-box">
+              <?php
+                $sql = "SELECT * FROM subject ORDER BY name ASC";
+                $query = $conn->query($sql);
+                while($srow = $query->fetch_assoc()){
+                  echo "
+                    <div class='checkbox'>
+                      <label>
+                        <input type='checkbox' name='course_subject[]' value='".htmlspecialchars($srow['id'])."'>
+                        ".htmlspecialchars($srow['name'])."
+                      </label>
+                    </div>
+                  ";
+                }
+              ?>
+            </div>
+          </div>
+
           <!-- Author -->
           <div class="form-group">
             <label class="col-sm-3 control-label">Author</label>
@@ -186,6 +216,36 @@
                       <label>
                         <input type='checkbox' name='category[]' value='".htmlspecialchars($crow['id'])."'>
                         ".htmlspecialchars($crow['name'])."
+                      </label>
+                    </div>
+                  ";
+                }
+              ?>
+            </div>
+          </div>
+
+          <!-- Subject -->
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Subject</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="edit_subject" name="subject" placeholder="Enter subject (e.g., Mathematics, Science)">
+              <small class="text-muted">Optional: General subject area of the book</small>
+            </div>
+          </div>
+
+          <!-- Course Subject -->
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Course Subject</label>
+            <div class="col-sm-9 category-box">
+              <?php
+                $sql = "SELECT * FROM subject ORDER BY name ASC";
+                $query = $conn->query($sql);
+                while($srow = $query->fetch_assoc()){
+                  echo "
+                    <div class='checkbox'>
+                      <label>
+                        <input type='checkbox' name='course_subject[]' value='".htmlspecialchars($srow['id'])."'>
+                        ".htmlspecialchars($srow['name'])."
                       </label>
                     </div>
                   ";

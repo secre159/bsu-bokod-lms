@@ -11,10 +11,10 @@ if (isset($_POST['add'])) {
     $author = trim($_POST['author']);
     $publisher = trim($_POST['publisher']);
     $pub_date = trim($_POST['pub_date']);
+    $subject = isset($_POST['subject']) ? trim($_POST['subject']) : '';
     $copies = isset($_POST['num_copies']) ? intval($_POST['num_copies']) : 1;
     $categories = isset($_POST['category']) ? $_POST['category'] : [];
-
-   // $subjects = isset($_POST['subject']) ? $_POST['subject'] : [];
+    $course_subjects = isset($_POST['course_subject']) ? $_POST['course_subject'] : [];
 
     // ===== Validation =====
     if (empty($categories)) {
@@ -22,12 +22,6 @@ if (isset($_POST['add'])) {
         header('location: book.php');
         exit();
     }
-
-   // if (empty($subjects)) {
-     //   $_SESSION['error'] = 'Please select at least one subject.';
-       // header('location: book.php');
-        //exit();
-    //}
 
     if (!preg_match("/^\d{4}(-\d{2}-\d{2})?$/", $pub_date)) {
         $_SESSION['error'] = "Publish Date must be YYYY or YYYY-MM-DD";
@@ -39,13 +33,13 @@ if (isset($_POST['add'])) {
 
     // ===== Prepare main insert =====
     $stmt = $conn->prepare("
-        INSERT INTO books (isbn, call_no, title, author, publisher, publish_date, copy_number, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 0)
+        INSERT INTO books (isbn, call_no, title, author, publisher, publish_date, subject, copy_number, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
     ");
-    $stmt->bind_param("ssssssi", $isbn, $call_no, $title, $author, $publisher, $pub_date, $copy_number);
+    $stmt->bind_param("sssssssi", $isbn, $call_no, $title, $author, $publisher, $pub_date, $subject, $copy_number);
 
     $cat_stmt = $conn->prepare("INSERT INTO book_category_map (book_id, category_id) VALUES (?, ?)");
-   // $subj_stmt = $conn->prepare("INSERT INTO book_subject_map (subject_id, book_id) VALUES (?, ?)"); // ✅ fixed order
+    $subj_stmt = $conn->prepare("INSERT INTO book_subject_map (book_id, subject_id) VALUES (?, ?)");
 
     $countInserted = 0;
 
@@ -61,11 +55,11 @@ if (isset($_POST['add'])) {
                 $cat_stmt->execute();
             }
 
-            // Map subjects (subject → book)
-         //   foreach ($subjects as $sub_id) {
-        //        $subj_stmt->bind_param("ii", $sub_id, $book_id);
-        //        $subj_stmt->execute();
-        //    }
+            // Map course subjects (book → subject)
+            foreach ($course_subjects as $sub_id) {
+                $subj_stmt->bind_param("ii", $book_id, $sub_id);
+                $subj_stmt->execute();
+            }
 
             $countInserted++;
         }

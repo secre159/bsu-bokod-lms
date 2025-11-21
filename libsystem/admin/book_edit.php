@@ -10,7 +10,9 @@ if (isset($_POST['edit'])) {
     $author = trim($_POST['author']);
     $publisher = trim($_POST['publisher']);
     $pub_date = trim($_POST['pub_date']);
+    $subject = isset($_POST['subject']) ? trim($_POST['subject']) : '';
     $categories = isset($_POST['category']) ? $_POST['category'] : [];
+    $course_subjects = isset($_POST['course_subject']) ? $_POST['course_subject'] : [];
 
     // ✅ Validation
     if (empty($categories)) {
@@ -45,10 +47,10 @@ if (isset($_POST['edit'])) {
     // ✅ Update all books that share same title, author, and publish date
     $stmt = $conn->prepare("
         UPDATE books 
-        SET isbn = ?, call_no = ?, title = ?, author = ?, publisher = ?, publish_date = ?
+        SET isbn = ?, call_no = ?, title = ?, author = ?, publisher = ?, publish_date = ?, subject = ?
         WHERE title = ? AND author = ? AND publish_date = ?
     ");
-    $stmt->bind_param("sssssssss", $isbn, $call_no, $title, $author, $publisher, $pub_date, $group_title, $group_author, $group_pubdate);
+    $stmt->bind_param("ssssssssss", $isbn, $call_no, $title, $author, $publisher, $pub_date, $subject, $group_title, $group_author, $group_pubdate);
 
     if ($stmt->execute()) {
         $stmt->close();
@@ -64,9 +66,10 @@ if (isset($_POST['edit'])) {
         }
         $get_books->close();
 
-        // ✅ Update category mappings for each affected copy
+        // ✅ Update category and subject mappings for each affected copy
         foreach ($affected_books as $book_id) {
             $conn->query("DELETE FROM book_category_map WHERE book_id = $book_id");
+            $conn->query("DELETE FROM book_subject_map WHERE book_id = $book_id");
 
             $cat_stmt = $conn->prepare("INSERT INTO book_category_map (book_id, category_id) VALUES (?, ?)");
             foreach ($categories as $cat_id) {
@@ -74,6 +77,13 @@ if (isset($_POST['edit'])) {
                 $cat_stmt->execute();
             }
             $cat_stmt->close();
+
+            $subj_stmt = $conn->prepare("INSERT INTO book_subject_map (book_id, subject_id) VALUES (?, ?)");
+            foreach ($course_subjects as $sub_id) {
+                $subj_stmt->bind_param("ii", $book_id, $sub_id);
+                $subj_stmt->execute();
+            }
+            $subj_stmt->close();
         }
 
         $_SESSION['success'] = 'All copies of this book were updated successfully.';

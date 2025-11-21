@@ -88,6 +88,24 @@ if(isset($_POST['apply_fixes'])){
         $errors[] = "✗ calibre_books_archive table does not exist - restore database first";
     }
     
+    // 5. Add subject column to books table (if table exists)
+    $books_exists = $conn->query("SHOW TABLES LIKE 'books'");
+    if($books_exists && $books_exists->num_rows > 0){
+        $check_column = $conn->query("SHOW COLUMNS FROM `books` LIKE 'subject'");
+        if($check_column->num_rows == 0){
+            $sql = "ALTER TABLE `books` ADD COLUMN `subject` varchar(255) DEFAULT NULL AFTER `publish_date`";
+            if($conn->query($sql)){
+                $success[] = "✓ Added 'subject' column to books table";
+            } else {
+                $errors[] = "✗ books.subject column: " . $conn->error;
+            }
+        } else {
+            $success[] = "✓ books.subject column already exists";
+        }
+    } else {
+        $errors[] = "✗ books table does not exist - restore database first";
+    }
+    
     // Re-enable foreign key checks
     $conn->query("SET FOREIGN_KEY_CHECKS=1");
     
@@ -158,7 +176,8 @@ include 'includes/header.php';
           • <strong>suggested_books</strong> table - For book suggestion feature<br>
           • <strong>faculty.archived</strong> column - For archiving faculty records<br>
           • <strong>archived_subject</strong> table - For archived subjects<br>
-          • <strong>calibre_books_archive.created_at</strong> column - For tracking archive timestamps
+          • <strong>calibre_books_archive.created_at</strong> column - For tracking archive timestamps<br>
+          • <strong>books.subject</strong> column - For storing book subject field
         </p>
       </div>
 
@@ -220,6 +239,21 @@ include 'includes/header.php';
                 } else {
                     $status[] = array(
                         'name' => 'calibre_books_archive table',
+                        'exists' => false
+                    );
+                }
+                
+                // Check books.subject column (only if table exists)
+                $books_exists = $conn->query("SHOW TABLES LIKE 'books'");
+                if($books_exists && $books_exists->num_rows > 0){
+                    $check = $conn->query("SHOW COLUMNS FROM `books` LIKE 'subject'");
+                    $status[] = array(
+                        'name' => 'books.subject column',
+                        'exists' => $check && $check->num_rows > 0
+                    );
+                } else {
+                    $status[] = array(
+                        'name' => 'books table',
                         'exists' => false
                     );
                 }

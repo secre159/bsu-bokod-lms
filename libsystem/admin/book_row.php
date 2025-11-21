@@ -30,6 +30,18 @@ if (isset($_POST['id'])) {
     }
     $stmt->close();
 
+    // Fetch course subjects assigned to this book
+    $selectedSubjects = [];
+    $sql = "SELECT subject_id FROM book_subject_map WHERE book_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $selectedSubjects[] = (string)$row['subject_id'];
+    }
+    $stmt->close();
+
     // Return all necessary details for the edit modal
     echo json_encode([
         'id' => $book['id'],
@@ -39,7 +51,9 @@ if (isset($_POST['id'])) {
         'author' => $book['author'],
         'publisher' => $book['publisher'],
         'publish_date' => $book['publish_date'],
-        'categories' => $selectedCats
+        'subject' => $book['subject'] ?? '',
+        'categories' => $selectedCats,
+        'subjects' => $selectedSubjects
     ]);
 }
 ?>

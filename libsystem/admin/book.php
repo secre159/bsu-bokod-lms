@@ -217,6 +217,7 @@ $available_books = $available_books_query->fetch_assoc()['available'];
                 <thead style="background: linear-gradient(135deg, #006400 0%, #004d00 100%); color: #FFD700; font-weight: 700;">
                   <th style="border-right: 1px solid #228B22;">Categories</th>
                   <th style="border-right: 1px solid #228B22;">Subject</th>
+                  <th style="border-right: 1px solid #228B22;">Course Subject</th>
                   <th style="border-right: 1px solid #228B22;">ISBN</th>
                   <th style="border-right: 1px solid #228B22;">Call No.</th>
                   <th style="border-right: 1px solid #228B22;">Title</th>
@@ -246,6 +247,7 @@ $available_books = $available_books_query->fetch_assoc()['available'];
                             books.date_created,
                             books.copy_number,
                             books.num_copies,
+                            books.subject AS book_subject,
                             GROUP_CONCAT(DISTINCT subject.name ORDER BY subject.name SEPARATOR ', ') AS subject_list,
                             GROUP_CONCAT(DISTINCT category.name ORDER BY category.name SEPARATOR ', ') AS category_list,
                             bt.status AS borrow_status,
@@ -286,6 +288,7 @@ $available_books = $available_books_query->fetch_assoc()['available'];
                         echo "
                         <tr style='transition: all 0.3s ease;'>
                             <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['category_list'] ?: 'Uncategorized')."</small></td>
+                            <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['book_subject'] ?: '-')."</small></td>
                             <td style='border-right: 1px solid #f0f0f0;'><small>".htmlspecialchars($row['subject_list'] ?: 'Unassigned')."</small></td>
                             <td style='border-right: 1px solid #f0f0f0; font-family: monospace;'><code>".htmlspecialchars($row['isbn'])."</code></td>
                             <td style='border-right: 1px solid #f0f0f0;'>".htmlspecialchars($row['call_no'])."</td>
@@ -407,6 +410,7 @@ function getRow(id){
       $('#edit_author').val(response.author);
       $('#edit_publisher').val(response.publisher);
       $('#datepicker_edit').val(response.publish_date);
+      $('#edit_subject').val(response.subject || '');
 
       // ✅ For Delete
       $('.bookid').val(response.id);        // 🔥 Fix: sets the hidden input for deletion
@@ -414,7 +418,7 @@ function getRow(id){
 
       // Reset all checkboxes
       $('input[name="category[]"]').prop('checked', false);
-      $('input[name="subject[]"]').prop('checked', false);
+      $('input[name="course_subject[]"]').prop('checked', false);
 
       // Check existing categories
       if (response.categories) {
@@ -423,10 +427,10 @@ function getRow(id){
         });
       }
 
-      // Check existing subjects
+      // Check existing course subjects
       if (response.subjects) {
         response.subjects.forEach(function(subj){
-          $('input[name="subject[]"][value="'+subj+'"]').prop('checked', true);
+          $('input[name="course_subject[]"][value="'+subj+'"]').prop('checked', true);
         });
       }
     }
