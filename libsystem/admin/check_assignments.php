@@ -39,12 +39,48 @@ if($check_table->num_rows == 0) {
         echo "</table>";
     }
     
+    // Check for ALL data (not just last 20)
+    echo "<h3>ALL Data in book_subject_map:</h3>";
+    $all_data = $conn->query("SELECT * FROM book_subject_map");
+    echo "<p>Total rows: ".$all_data->num_rows."</p>";
+    if($all_data->num_rows > 0) {
+        echo "<table border='1' cellpadding='5'>";
+        echo "<tr><th>ID</th><th>Book ID</th><th>Subject ID</th></tr>";
+        while($r = $all_data->fetch_assoc()) {
+            echo "<tr><td>{$r['id']}</td><td>{$r['book_id']}</td><td>{$r['subject_id']}</td></tr>";
+        }
+        echo "</table>";
+    }
+    
+    // Check for unique constraint
+    echo "<h3>Table Indexes/Keys:</h3>";
+    $keys = $conn->query("SHOW KEYS FROM book_subject_map");
+    if($keys && $keys->num_rows > 0) {
+        echo "<table border='1' cellpadding='5'>";
+        echo "<tr><th>Key Name</th><th>Column</th><th>Unique</th></tr>";
+        while($k = $keys->fetch_assoc()) {
+            $unique = $k['Non_unique'] == 0 ? 'YES' : 'NO';
+            echo "<tr><td>{$k['Key_name']}</td><td>{$k['Column_name']}</td><td>{$unique}</td></tr>";
+        }
+        echo "</table>";
+    }
+    
     // Try a manual insert to test
     echo "<h3>Manual Insert Test:</h3>";
     echo "<p>Trying to insert book_id=1, subject_id=19...</p>";
     $test_insert = $conn->query("INSERT IGNORE INTO book_subject_map (book_id, subject_id) VALUES (1, 19)");
     if($test_insert) {
         echo "<p style='color: green;'>✅ Manual insert successful! Affected rows: ".$conn->affected_rows."</p>";
+        if($conn->affected_rows == 0) {
+            echo "<p style='color: orange;'>⚠️ This combination already exists (UNIQUE constraint)!</p>";
+            // Check if it exists
+            $check = $conn->query("SELECT * FROM book_subject_map WHERE book_id=1 AND subject_id=19");
+            if($check && $check->num_rows > 0) {
+                echo "<p style='color: red;'>Found existing row!</p>";
+            } else {
+                echo "<p style='color: red;'>No existing row found - something else is wrong!</p>";
+            }
+        }
     } else {
         echo "<p style='color: red;'>❌ Manual insert failed: ".$conn->error."</p>";
     }
