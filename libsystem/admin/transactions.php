@@ -1,5 +1,4 @@
 <?php include 'includes/session.php'; ?>
-<?php include 'includes/header.php'; ?>
 <?php include 'includes/conn.php'; ?>
 <?php
 // --- BACKEND LOGIC --- //
