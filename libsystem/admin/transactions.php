@@ -1,6 +1,120 @@
-<?php include 'includes/session.php'; ?>
-<?php include 'includes/conn.php'; ?>
-<?php
+<?php 
+include 'includes/session.php';
+include 'includes/conn.php';
+
+// Set timezone
+date_default_timezone_set('Asia/Manila');
+
+// --- EXPORT HANDLER (MUST BE BEFORE ANY OUTPUT) --- //
+if(isset($_GET['export']) && $_GET['export'] == 'word') {
+    $filter = $_GET['filter'] ?? '';
+    $where = '';
+    $title = 'All Transactions';
+    $today = date('Y-m-d');
+    
+    switch ($filter) {
+        case 'borrowed_today':
+            $where = "WHERE DATE(bt.borrow_date) = CURDATE()";
+            $title = 'Borrowed Today';
+            break;
+        case 'returned_today':
+            $where = "WHERE DATE(bt.return_date) = CURDATE() AND bt.status = 'returned'";
+            $title = 'Returned Today';
+            break;
+        case 'overdue':
+            $where = "WHERE bt.status = 'borrowed' AND bt.due_date < CURDATE()";
+            $title = 'Overdue Books';
+            break;
+        default:
+            $where = '';
+            $title = 'All Transactions';
+    }
+    
+    $sql = "SELECT bt.*, 
+                  b.call_no, b.title, b.author, b.publish_date,
+                  s.student_id, s.firstname AS s_fname, s.middlename AS s_mname, s.lastname AS s_lname, 
+                  c.code AS course_code, c.title AS course_title,
+                  f.faculty_id, f.firstname AS f_fname, f.middlename AS f_mname, f.lastname AS f_lname, f.department
+            FROM borrow_transactions bt
+            LEFT JOIN books b ON bt.book_id = b.id
+            LEFT JOIN students s ON (bt.borrower_type='student' AND bt.borrower_id=s.id)
+            LEFT JOIN course c ON s.course_id = c.id
+            LEFT JOIN faculty f ON (bt.borrower_type='faculty' AND bt.borrower_id=f.id)
+            $where
+            ORDER BY bt.borrow_date DESC";
+    
+    $export_query = $conn->query($sql);
+    
+    header("Content-Type: application/vnd.ms-word");
+    header("Content-Disposition: attachment; filename=book_transactions_report_" . date('Y-m-d') . ".doc");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+    
+    echo "<html>
+    <head>
+    <meta charset='utf-8'>
+    <title>Book Transactions Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 11pt; margin: 20px; }
+        h1 { color: #006400; text-align: center; border-bottom: 2px solid #006400; padding-bottom: 10px; }
+        .report-info { text-align: center; margin: 10px 0 20px 0; color: #666; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #006400; color: white; padding: 8px; text-align: left; border: 1px solid #ddd; }
+        td { padding: 6px; border: 1px solid #ddd; }
+        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 10pt; }
+    </style>
+    </head>
+    <body>";
+    
+    echo "<h1>BOOK TRANSACTIONS REPORT</h1>";
+    echo "<div class='report-info'>Library Management System | " . date('F j, Y') . " | " . $title . "</div>";
+    
+    echo "<table>";
+    echo "<tr>
+        <th>Borrower Type</th>
+        <th>ID Number</th>
+        <th>Name</th>
+        <th>Call Number</th>
+        <th>Book Title</th>
+        <th>Date Borrowed</th>
+        <th>Due Date</th>
+        <th>Status</th>
+    </tr>";
+    
+    if($export_query->num_rows > 0) {
+        while($row = $export_query->fetch_assoc()) {
+            if ($row['borrower_type'] == 'student') {
+                $borrowerID = $row['student_id'];
+                $borrowerName = $row['s_fname'] . ' ' . (!empty($row['s_mname']) ? $row['s_mname'].' ' : '') . $row['s_lname'];
+            } else {
+                $borrowerID = $row['faculty_id'];
+                $borrowerName = $row['f_fname'] . ' ' . (!empty($row['f_mname']) ? $row['f_mname'].' ' : '') . $row['f_lname'];
+            }
+
+            $status = ($row['status'] == 'returned') ? 'Returned' : 
+                     (($today > $row['due_date']) ? 'Overdue' : 'Borrowed');
+
+            echo "<tr>
+                <td>" . ucfirst($row['borrower_type']) . "</td>
+                <td>" . $borrowerID . "</td>
+                <td>" . $borrowerName . "</td>
+                <td>" . $row['call_no'] . "</td>
+                <td>" . $row['title'] . "</td>
+                <td>" . date('M d, Y', strtotime($row['borrow_date'])) . "</td>
+                <td>" . date('M d, Y', strtotime($row['due_date'])) . "</td>
+                <td>" . $status . "</td>
+            </tr>";
+        }
+    } else {
+        echo "<tr><td colspan='8' style='text-align: center;'>No records found</td></tr>";
+    }
+
+    echo "</table>";
+    echo "<div class='footer'>Generated on " . date('F j, Y \a\t g:i A') . " | Total Records: " . $export_query->num_rows . "</div>";
+    echo "</body></html>";
+    exit();
+}
+
 // --- BACKEND LOGIC --- //
 // Add Borrow
 if (isset($_POST['add'])) {
@@ -73,90 +187,6 @@ $sql = "SELECT bt.*,
         ORDER BY bt.borrow_date DESC";
 
 $query = $conn->query($sql);
-
-
-// Handle Word Export
-if(isset($_GET['export']) && $_GET['export'] == 'word') {
-    header("Content-Type: application/vnd.ms-word");
-    header("Content-Disposition: attachment; filename=book_transactions_report_" . date('Y-m-d') . ".doc");
-    header("Pragma: no-cache");
-    header("Expires: 0");
-    
-    $word_content = "<html>
-    <head>
-    <meta charset='utf-8'>
-    <title>Book Transactions Report</title>
-    <style>
-        body { font-family: Arial, sans-serif; font-size: 11pt; margin: 20px; }
-        h1 { color: #006400; text-align: center; border-bottom: 2px solid #006400; padding-bottom: 10px; }
-        .report-info { text-align: center; margin: 10px 0 20px 0; color: #666; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th { background: #006400; color: white; padding: 8px; text-align: left; border: 1px solid #ddd; }
-        td { padding: 6px; border: 1px solid #ddd; }
-        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 10pt; }
-        @media print {
-            body { margin: 0; }
-            .no-print { display: none; }
-        }
-    </style>
-    </head>
-    <body>";
-    
-    $word_content .= "<h1>BOOK TRANSACTIONS REPORT</h1>";
-    $word_content .= "<div class='report-info'>Library Management System | " . date('F j, Y') . " | " . $title . "</div>";
-    
-    $word_content .= "<table>";
-    $word_content .= "<tr>
-        <th>Borrower Type</th>
-        <th>ID Number</th>
-        <th>Name</th>
-        <th>Call Number</th>
-        <th>Book Title</th>
-        <th>Date Borrowed</th>
-        <th>Due Date</th>
-        <th>Status</th>
-    </tr>";
-    
-   // Re-execute query for export
-$export_query = $conn->query($sql);
-if($export_query->num_rows > 0) {
-    while($row = $export_query->fetch_assoc()) {
-        if ($row['borrower_type'] == 'student') {
-            $borrowerID = $row['student_id'];
-            // Include middle name if available
-            $borrowerName = $row['s_fname'] . ' ' . (!empty($row['s_mname']) ? $row['s_mname'].' ' : '') . $row['s_lname'];
-        } else {
-            $borrowerID = $row['faculty_id'];
-            // Include middle name if available
-            $borrowerName = $row['f_fname'] . ' ' . (!empty($row['f_mname']) ? $row['f_mname'].' ' : '') . $row['f_lname'];
-        }
-
-        $status = ($row['status'] == 'returned') ? 'Returned' : 
-                 (($today > $row['due_date']) ? 'Overdue' : 'Borrowed');
-
-        $word_content .= "<tr>
-            <td>" . ucfirst($row['borrower_type']) . "</td>
-            <td>" . $borrowerID . "</td>
-            <td>" . $borrowerName . "</td>
-            <td>" . $row['call_no'] . "</td>
-            <td>" . $row['title'] . "</td>
-            <td>" . date('M d, Y', strtotime($row['borrow_date'])) . "</td>
-            <td>" . date('M d, Y', strtotime($row['due_date'])) . "</td>
-            <td>" . $status . "</td>
-        </tr>";
-    }
-} else {
-    $word_content .= "<tr><td colspan='8' style='text-align: center;'>No records found</td></tr>";
-}
-
-$word_content .= "</table>";
-$word_content .= "<div class='footer'>Generated on " . date('F j, Y \a\t g:i A') . " | Total Records: " . $export_query->num_rows . "</div>";
-$word_content .= "</body></html>";
-
-echo $word_content;
-exit();
-
-}
 ?>
 
 <!DOCTYPE html>
@@ -251,34 +281,6 @@ exit();
             background: linear-gradient(135deg, #1C86EE 0%, #1874CD 100%);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
-        }
-        
-        .print-btn {
-            background: linear-gradient(135deg, #006400 0%, #004d00 100%);
-            color: #FFD700;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .print-btn:hover {
-            background: linear-gradient(135deg, #004d00 0%, #003300 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,100,0,0.3);
-        }
-        
-        /* Print Styles */
-        @media print {
-            .no-print { display: none !important; }
-            .main-card { box-shadow: none; border: 1px solid #ddd; }
-            .filter-section, .card-header, .nav-tabs { display: none !important; }
-            .table th { background: #006400 !important; color: white !important; -webkit-print-color-adjust: exact; }
-            body { background: white !important; }
-            .content-wrapper { margin: 0 !important; padding: 0 !important; }
-            .table { font-size: 10pt; }
-            h1 { color: #006400 !important; }
         }
         
         /* Tab Styling */
@@ -396,7 +398,7 @@ exit();
                 margin-top: 10px;
             }
             
-            .filter-btn, .export-btn, .print-btn {
+            .filter-btn, .export-btn {
                 padding: 8px 12px;
                 font-size: 14px;
             }
@@ -492,11 +494,8 @@ exit();
             <div class="col-md-4">
               <div class="export-buttons">
                 <a href="?<?php echo http_build_query(array_merge($_GET, ['export' => 'word'])); ?>" class="export-btn">
-                  <i class="fa fa-file-word-o"></i> Export to Word
+                  <i class="fa fa-file-word-o"></i> Export
                 </a>
-                <button onclick="window.print()" class="print-btn">
-                  <i class="fa fa-print"></i> Print
-                </button>
                 <button type="button" class="notify-btn" data-toggle="modal" data-target="#notifyOverdueModal" onclick="loadOverdueInfo()">
                   <i class="fa fa-bell"></i> Notify Overdue
                 </button>
