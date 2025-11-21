@@ -111,7 +111,7 @@ if(isset($_POST['apply_fixes'])){
         // Check if index exists on title
         $check_index = $conn->query("SHOW INDEX FROM `books` WHERE Key_name = 'idx_title'");
         if($check_index->num_rows == 0){
-            $sql = "ALTER TABLE `books` ADD INDEX `idx_title` (`title`)";
+            $sql = "ALTER TABLE `books` ADD INDEX `idx_title` (`title`(255))";
             if($conn->query($sql)){
                 $success[] = "✓ Added performance index on books.title";
             } else {
@@ -124,7 +124,7 @@ if(isset($_POST['apply_fixes'])){
         // Check if index exists on author
         $check_index = $conn->query("SHOW INDEX FROM `books` WHERE Key_name = 'idx_author'");
         if($check_index->num_rows == 0){
-            $sql = "ALTER TABLE `books` ADD INDEX `idx_author` (`author`)";
+            $sql = "ALTER TABLE `books` ADD INDEX `idx_author` (`author`(255))";
             if($conn->query($sql)){
                 $success[] = "✓ Added performance index on books.author";
             } else {
