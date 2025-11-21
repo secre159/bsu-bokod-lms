@@ -12,8 +12,19 @@ if(isset($_POST['id'])){
     $employee = $result->fetch_assoc();
 
     if($employee){
-        $insert = $conn->prepare("INSERT INTO faculty (firstname, lastname, email, position) VALUES (?, ?, ?, ?)");
-        $insert->bind_param("ssss", $employee['firstname'], $employee['lastname'], $employee['email'], $employee['position']);
+        // Restore faculty with all required fields
+        $faculty_id = $employee['faculty_id'] ?? '';
+        $password = $employee['password'] ?? password_hash($employee['faculty_id'], PASSWORD_DEFAULT);
+        $firstname = $employee['firstname'] ?? '';
+        $middlename = $employee['middlename'] ?? '';
+        $lastname = $employee['lastname'] ?? '';
+        $phone = $employee['phone'] ?? '';
+        $email = $employee['email'] ?? '';
+        $department = $employee['department'] ?? '';
+        $created_on = $employee['created_on'] ?? date('Y-m-d');
+        
+        $insert = $conn->prepare("INSERT INTO faculty (faculty_id, password, firstname, middlename, lastname, phone, email, department, created_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $insert->bind_param("sssssssss", $faculty_id, $password, $firstname, $middlename, $lastname, $phone, $email, $department, $created_on);
         $insert->execute();
 
         $delete = $conn->prepare("DELETE FROM archived_faculty WHERE id=?");
