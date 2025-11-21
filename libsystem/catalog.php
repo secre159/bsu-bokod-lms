@@ -326,6 +326,7 @@ body {
                   <th>Call No.</th>
                   <th>Location</th>
                   <th>Categories</th>
+                  <th>Subject</th>
                   <th>Topics</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -338,7 +339,7 @@ body {
                 // Physical Books with simplified status (combining overdue and borrowed as unavailable)
                 $sqlBooks = "
                     SELECT 
-                        b.id, b.title, b.author, b.call_no, b.location,
+                        b.id, b.title, b.author, b.call_no, b.location, b.subject,
                         GROUP_CONCAT(DISTINCT c.name SEPARATOR ', ') AS categories,
                         GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS topics,
                         CASE 
@@ -360,6 +361,7 @@ body {
                 $queryBooks = $conn->query($sqlBooks);
                 while($row = $queryBooks->fetch_assoc()) {
                     $categories = $row['categories'] ?: '-';
+                    $subject = $row['subject'] ?: '-';
                     $topics = $row['topics'] ?: '-';
 
                     $statusBadge = '';
@@ -383,7 +385,7 @@ body {
                     }
 
                     echo "
-                    <tr class='$statusClass' data-type='physical' data-status='$statusText' data-category='".htmlspecialchars($row['categories'] ?? '')."' data-location='".htmlspecialchars($row['location'] ?? '')."'>
+                    <tr class='$statusClass' data-type='physical' data-status='$statusText' data-category='".htmlspecialchars($row['categories'] ?? '')."' data-subject='".htmlspecialchars($subject ?? '')."' data-location='".htmlspecialchars($row['location'] ?? '')."'>
                         <td class='text-center fw-bold'>{$i}</td>
                         <td class='fw-semibold'>".htmlspecialchars($row['title'] ?? '')."</td>
                         <td>
@@ -393,6 +395,7 @@ body {
                         <td class='text-center'>".htmlspecialchars($row['call_no'] ?? '-')."</td>
                         <td>".htmlspecialchars($row['location'] ?? '-')."</td>
                         <td><div class='badge-container'>".render_badges_with_more($categories,'bg-light')."</div></td>
+                        <td><div class='badge-container'>".render_badges_with_more($subject,'bg-warning')."</div></td>
                         <td><div class='badge-container'>".render_badges_with_more($topics,'bg-info')."</div></td>
                         <td class='text-center'>$statusBadge</td>
                         <td class='text-center text-muted'>—</td>

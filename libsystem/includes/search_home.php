@@ -18,6 +18,7 @@ SELECT
   COALESCE(b.call_no, '') AS call_no,
   COALESCE(b.location, '') AS location,
   COALESCE(b.publish_date, '') AS publish_date,
+  COALESCE(b.subject, '') AS book_subject,
   GROUP_CONCAT(DISTINCT c.name SEPARATOR ', ') AS categories,
   GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS subjects,
   'Book' AS type,
@@ -33,11 +34,12 @@ LEFT JOIN borrow_transactions bt ON bt.book_id = b.id AND bt.status = 'borrowed'
 WHERE
   b.title LIKE '%$search%'
   OR b.author LIKE '%$search%'
+  OR b.subject LIKE '%$search%'
   OR c.name LIKE '%$search%'
   OR s.name LIKE '%$search%'
   OR b.publish_date LIKE '%$search%'
 GROUP BY
-  b.title, b.author, COALESCE(b.call_no, ''), COALESCE(b.location, ''), COALESCE(b.publish_date, '')
+  b.title, b.author, COALESCE(b.call_no, ''), COALESCE(b.location, ''), COALESCE(b.publish_date, ''), COALESCE(b.subject, '')
 UNION ALL
 -- Calibre / digital entries
 SELECT
@@ -92,13 +94,16 @@ while ($row = $result->fetch_assoc()) {
         $statusClass = ($available > 0 && $borrowed > 0) ? "text-warning" : (($available > 0) ? "text-success" : "text-danger");
     }
 
-    // badges (categories, subjects/tags)
+    // badges (categories, book subject, subjects/topics)
     $badges = '';
     if (!empty($row['categories'])) {
         $cats = array_map('trim', explode(',', $row['categories']));
         foreach ($cats as $c) {
             $badges .= "<span class='badge bg-light text-dark me-1 mb-1' style='max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;' title='".htmlspecialchars($c)."'>".htmlspecialchars($c)."</span>";
         }
+    }
+    if (!empty($row['book_subject'])) {
+        $badges .= "<span class='badge bg-warning text-dark me-1 mb-1' style='max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;' title='Subject: ".htmlspecialchars($row['book_subject'])."'>".htmlspecialchars($row['book_subject'])."</span>";
     }
     if (!empty($row['subjects'])) {
         $subs = array_map('trim', explode(',', $row['subjects']));
