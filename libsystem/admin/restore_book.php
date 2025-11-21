@@ -54,8 +54,12 @@ if (isset($_POST['id'])) {
         if ($catRes->num_rows > 0) {
             $insertCat = $conn->prepare("INSERT INTO book_category_map (book_id, category_id) VALUES (?, ?)");
             while ($cat = $catRes->fetch_assoc()) {
-                $insertCat->bind_param("ii", $restored_book_id, $cat['category_id']);
-                $insertCat->execute();
+                // Check if category still exists before restoring
+                $checkCat = $conn->query("SELECT id FROM category WHERE id = " . intval($cat['category_id']));
+                if ($checkCat && $checkCat->num_rows > 0) {
+                    $insertCat->bind_param("ii", $restored_book_id, $cat['category_id']);
+                    $insertCat->execute();
+                }
             }
             $insertCat->close();
         }
