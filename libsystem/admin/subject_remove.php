@@ -15,8 +15,8 @@ if(isset($_POST['confirm_remove_subject'])){
 
     if($subject){
         // 2️⃣ Insert into archived_subject table
-        $stmt = $conn->prepare("INSERT INTO archived_subject (subject_title, archived_at) VALUES (?, NOW())");
-        $stmt->bind_param("s", $subject['name']);
+        $stmt = $conn->prepare("INSERT INTO archived_subject (subject_id, name, date_archived) VALUES (?, ?, NOW())");
+        $stmt->bind_param("is", $subject_id, $subject['name']);
         if($stmt->execute()){
             $stmt->close();
 
