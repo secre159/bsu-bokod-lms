@@ -146,12 +146,15 @@ $available_books = $available_books_query->fetch_assoc()['available'];
           <div class="box" style="border: none; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,100,0,0.15); overflow: hidden;">
             <!-- Enhanced Card Header -->
             <div class="box-header with-border" style="background: linear-gradient(135deg, #f0fff0 0%, #e0f7e0 100%); padding: 25px; border-bottom: 2px solid #006400;">
-              <div class="row">
-                <div class="col-md-6">
-                  <div style="display: flex; align-items: center; gap: 15px;">
+              <div class="row" style="margin-bottom: 15px;">
+                <div class="col-md-12">
+                  <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                     <a href="#addnew" data-toggle="modal" class="btn btn-success btn-flat" style="background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); border: none; border-radius: 6px; font-weight: 600; padding: 12px 25px; box-shadow: 0 2px 4px rgba(0,100,0,0.2);">
                       <i class="fa fa-plus-circle" style="margin-right: 8px;"></i> Add New Book
                     </a>
+                    <div style="flex: 1; max-width: 400px;">
+                      <input type="text" id="quickSearch" class="form-control" placeholder="🔍 Quick search by title, author, ISBN, call no..." style="border-radius: 6px; border: 1px solid #006400; padding: 10px;">
+                    </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                       <span class="badge" style="background: linear-gradient(135deg, #006400 0%, #004d00 100%); color: #FFD700; padding: 8px 16px; border-radius: 20px; font-weight: 600;">
                         <i class="fa fa-filter"></i> Active Filters
@@ -170,10 +173,11 @@ $available_books = $available_books_query->fetch_assoc()['available'];
                           <?php endif; ?>
                         </div>
                       <?php endif; ?>
-                    </div>
                   </div>
                 </div>
-                <div class="col-md-6">
+              </div>
+              <div class="row">
+                <div class="col-md-12">
                   <div class="box-tools pull-right">
                     <div class="filter-section" style="display: flex; gap: 15px; justify-content: flex-end;">
                       <div class="form-group" style="margin: 0;">
@@ -347,22 +351,31 @@ $available_books = $available_books_query->fetch_assoc()['available'];
 
 <script>
 $(function(){
+  // Category and Subject filters
   $('#select_category').change(function(){
     var value = $(this).val();
     var subj = $('#select_subject').val();
-    var url = 'book.php?';
-    if(value > 0) url += 'category=' + value + '&';
-    if(subj > 0) url += 'subject=' + subj;
-    window.location = url;
+    if(value == 0 && subj == 0) {
+      window.location = 'book.php';
+    } else {
+      var url = 'book.php?';
+      if(value > 0) url += 'category=' + value;
+      if(subj > 0) url += (value > 0 ? '&' : '') + 'subject=' + subj;
+      window.location = url;
+    }
   });
 
   $('#select_subject').change(function(){
     var value = $(this).val();
     var cat = $('#select_category').val();
-    var url = 'book.php?';
-    if(cat > 0) url += 'category=' + cat + '&';
-    if(value > 0) url += 'subject=' + value;
-    window.location = url;
+    if(cat == 0 && value == 0) {
+      window.location = 'book.php';
+    } else {
+      var url = 'book.php?';
+      if(cat > 0) url += 'category=' + cat;
+      if(value > 0) url += (cat > 0 ? '&' : '') + 'subject=' + value;
+      window.location = url;
+    }
   });
 
   $(document).on('click', '.edit', function(e){
@@ -439,17 +452,30 @@ function getRow(id){
 
 
 $(function () {
-  $('#example1').DataTable({
+  // Initialize DataTable with performance optimizations
+  var table = $('#example1').DataTable({
     responsive: true,
+    "deferRender": true,
+    "processing": true,
+    "pageLength": 25,
+    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
     "language": {
-      "search": "🔍 Search books:",
+      "search": "🔍 Filter results:",
       "lengthMenu": "Show _MENU_ books per page",
       "info": "Showing _START_ to _END_ of _TOTAL_ books",
+      "infoFiltered": "(filtered from _MAX_ total books)",
+      "processing": "Loading books...",
       "paginate": {
         "previous": "← Previous",
         "next": "Next →"
       }
-    }
+    },
+    "dom": 'lrtip' // Remove default search box since we have custom one
+  });
+
+  // Quick search functionality
+  $('#quickSearch').on('keyup', function() {
+    table.search(this.value).draw();
   });
 });
 </script>
