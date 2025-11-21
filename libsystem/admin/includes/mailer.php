@@ -73,7 +73,7 @@ function sendMailTemplate($to, $subject, $body)
 }
 
 // ✅ Function to send overdue notification
-function sendOverdueNotice($borrower_name, $email, $book_title, $due_date)
+function sendOverdueNotice($borrower_name, $email, $book_title, $due_date, $days_overdue = 0)
 {
     $subject = "Overdue Book Reminder - BSU-Bokod Library System";
 
@@ -82,6 +82,7 @@ function sendOverdueNotice($borrower_name, $email, $book_title, $due_date)
         <h2 style='color: #2c3e50;'>Overdue Book Notice</h2>
         <p>Dear <b>$borrower_name</b>,</p>
         <p>This is a friendly reminder that the book <b>\"$book_title\"</b> borrowed from the BSU Library was due on <b>$due_date</b>.</p>
+        <p>The book is now <b style='color: #e74c3c;'>$days_overdue day(s) overdue</b>.</p>
         <p>Please return the book as soon as possible to avoid further penalties.</p>
         <p>Thank you for your attention to this matter.</p>
         <hr>
