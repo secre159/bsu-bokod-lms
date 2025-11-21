@@ -78,5 +78,39 @@
         height: 100%;
         border-radius: 5px;
       }
+
+      /* Fixed sidebar styling */
+      .main-sidebar {
+        position: fixed !important;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      /* Adjust content wrapper to account for fixed sidebar */
+      @media (min-width: 768px) {
+        .content-wrapper,
+        .main-footer {
+          margin-left: 230px;
+        }
+      }
+
+      /* Scrollbar styling for sidebar */
+      .main-sidebar::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .main-sidebar::-webkit-scrollbar-track {
+        background: #1a1a1a;
+      }
+
+      .main-sidebar::-webkit-scrollbar-thumb {
+        background: #006400;
+        border-radius: 4px;
+      }
+
+      .main-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #228B22;
+      }
   	</style>
 </head>
