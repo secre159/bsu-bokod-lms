@@ -551,14 +551,23 @@ $query = $conn->query($sql);
         while ($row = $query->fetch_assoc()) {
             if ($row['borrower_type'] == 'student') {
                 $borrowerID = $row['student_id'];
+<<<<<<< HEAD
                 $borrowerName = $row['s_fname'] . ' ' . (!empty($row['s_mname']) ? $row['s_mname'].' ' : '') . $row['s_lname'];
             } else {
                 $borrowerID = $row['faculty_id'];
+=======
+                // Include middle name if available
+                $borrowerName = $row['s_fname'] . ' ' . (!empty($row['s_mname']) ? $row['s_mname'].' ' : '') . $row['s_lname'];
+            } else {
+                $borrowerID = $row['faculty_id'];
+                // Include middle name if available
+>>>>>>> 61c0223f54f548fedd5bd0268df79d9be837abd3
                 $borrowerName = $row['f_fname'] . ' ' . (!empty($row['f_mname']) ? $row['f_mname'].' ' : '') . $row['f_lname'];
             }
 
             if ($row['status'] == 'returned') {
                 $status = '<span class="label label-success">Returned</span>';
+<<<<<<< HEAD
                 $action = "<button class='btn btn-danger btn-sm delete-btn no-print' data-id='{$row['id']}' style='font-weight: 600;'>
                               <i class='fa fa-trash'></i> Delete
                            </button>";
@@ -590,6 +599,23 @@ $query = $conn->query($sql);
                 ";
             }
 
+=======
+            } elseif ($today > $row['due_date']) {
+                $status = '<span class="label label-danger">Overdue</span>';
+            } else {
+                $status = '<span class="label label-warning">Borrowed</span>';
+            }
+
+            $action = ($row['status'] != 'returned') ? "
+              <button class='btn btn-success btn-sm return-btn no-print' data-id='{$row['id']}' 
+                      data-borrower-id='{$borrowerID}' data-borrower-name='{$borrowerName}'
+                      data-callno='{$row['call_no']}' data-title='{$row['title']}'
+                      data-author='{$row['author']}' style='font-weight: 600;'>
+                <i class='fa fa-undo'></i> Return
+              </button>
+            " : "<span class='text-muted'>--</span>";
+
+>>>>>>> 61c0223f54f548fedd5bd0268df79d9be837abd3
             echo "
             <tr>
               <td style='font-weight: 500;'>".ucfirst($row['borrower_type'])."</td>
@@ -609,7 +635,12 @@ $query = $conn->query($sql);
   </div>
 </div>
 
+<<<<<<< HEAD
 <!-- RETURN TAB -->
+=======
+
+            <!-- RETURN TAB -->
+>>>>>>> 61c0223f54f548fedd5bd0268df79d9be837abd3
 <div class="tab-pane" id="return">
   <div class="table-responsive">
     <table id="returnTable" class="table table-bordered table-striped table-hover" style="margin: 0;">
@@ -622,7 +653,10 @@ $query = $conn->query($sql);
           <th style="border-right: 1px solid #228B22;">Book Title</th>
           <th style="border-right: 1px solid #228B22;">Date Borrowed</th>
           <th>Date Returned</th>
+<<<<<<< HEAD
           <th class="no-print">Action</th>
+=======
+>>>>>>> 61c0223f54f548fedd5bd0268df79d9be837abd3
         </tr>
       </thead>
       <tbody>
@@ -644,6 +678,7 @@ $query = $conn->query($sql);
             $borrowerName = ($row['borrower_type']=='student') 
                 ? $row['s_fname'].' '.(!empty($row['s_mname']) ? $row['s_mname'].' ' : '').$row['s_lname'] 
                 : $row['f_fname'].' '.(!empty($row['f_mname']) ? $row['f_mname'].' ' : '').$row['f_lname'];
+<<<<<<< HEAD
 
             $action = "
               <button class='btn btn-danger btn-sm delete-btn no-print' data-id='{$row['id']}' style='font-weight: 600;'>
@@ -651,6 +686,8 @@ $query = $conn->query($sql);
               </button>
             ";
 
+=======
+>>>>>>> 61c0223f54f548fedd5bd0268df79d9be837abd3
             echo "
             <tr>
               <td style='font-weight: 500;'>".ucfirst($row['borrower_type'])."</td>
@@ -660,7 +697,10 @@ $query = $conn->query($sql);
               <td style='font-weight: 500;'>{$row['title']}</td>
               <td>".date('M d, Y', strtotime($row['borrow_date']))."</td>
               <td style='font-weight: 500;'>".date('M d, Y H:i:s', strtotime($row['return_date']))."</td>
+<<<<<<< HEAD
               <td class='text-center no-print'>{$action}</td>
+=======
+>>>>>>> 61c0223f54f548fedd5bd0268df79d9be837abd3
             </tr>";
         }
         ?>
@@ -669,6 +709,7 @@ $query = $conn->query($sql);
   </div>
 </div>
 
+<<<<<<< HEAD
 <!-- JavaScript for Delete -->
 <script>
 $(document).on('click', '.delete-btn', function(){
@@ -693,6 +734,8 @@ $(document).on('click', '.delete-btn', function(){
 </script>
 
 
+=======
+>>>>>>> 61c0223f54f548fedd5bd0268df79d9be837abd3
       </div><!-- End Main Card -->
 
     </section>
